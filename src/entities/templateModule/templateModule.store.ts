@@ -1,9 +1,8 @@
 import type { TemplateItem } from './model/types'
-import { inject, injectable } from '@needle-di/core'
+import { inject } from '@needle-di/core'
 import { atom, computed, sleep, withAsyncData, wrap } from '@reatom/core'
 import { TemplateModuleService } from './services/templateModuleService/templateModule.service'
 
-@injectable()
 export class TemplateModuleStore {
 	constructor(
 		private readonly templateModuleService = inject(TemplateModuleService),
@@ -18,7 +17,7 @@ export class TemplateModuleStore {
 			await wrap(sleep(150))
 		}
 
-		return await wrap(this.templateModuleService.getTemplateItems(query))
+		return wrap(this.templateModuleService.getTemplateItems(query))
 	}).extend(withAsyncData({ initState: [] }))
 
 	selectedItems = computed(() =>

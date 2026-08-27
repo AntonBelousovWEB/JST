@@ -1,10 +1,19 @@
 import antfu from '@antfu/eslint-config'
-import testStructure from './eslint-plugin-test-structure.js'
 
 export default antfu(
 	{
 		react: true,
-		typescript: true,
+		typescript: {
+			tsconfigPath: 'tsconfig.json',
+			overridesTypeAware: {
+				'ts/no-misused-promises': ['error', {
+					checksVoidReturn: { attributes: false },
+				}],
+				'ts/promise-function-async': 'off',
+				'ts/strict-boolean-expressions': 'off',
+			},
+		},
+		lessOpinionated: true,
 		stylistic: {
 			indent: 'tab',
 			quotes: 'single',
@@ -14,46 +23,58 @@ export default antfu(
 			html: true,
 			css: true,
 		},
+		ignores: ['.react-router/**', 'build/**', 'coverage/**', 'playwright-report/**', 'test-results/**'],
 		rules: {
 			'no-console': ['error', { allow: ['log', 'error'] }],
-
-			'no-restricted-syntax': [
-				'error',
-				{
-					selector: 'TSTypeAliasDeclaration',
-					message:
-						'❌ Type aliases запрещены в основном коде — держите их только в *.types.ts / types.tsx',
-				},
-				{
-					selector: 'TSInterfaceDeclaration',
-					message:
-						'❌ Interfaces запрещены в основном коде — держите их только в *.types.ts / types.tsx',
-				},
-			],
 		},
 	},
 	{
-		files: [
-			'**/*.types.ts',
-			'**/*.types.tsx',
-			'**/types.ts',
-			'**/types.tsx',
-			'**/*.dto.types.ts',
-			'**/*.dto.types.tsx',
-			'**/routes.types.ts',
-			'**/routes.types.tsx',
-		],
-		rules: {
-			'no-restricted-syntax': 'off',
+		linterOptions: {
+			reportUnusedDisableDirectives: 'error',
 		},
 	},
 	{
-		plugins: {
-			'test-structure': testStructure,
-		},
-		files: ['**/*.test.ts', '**/*.test.tsx'],
+		files: ['src/shared/**/*.{ts,tsx}'],
 		rules: {
-			'test-structure/enforce-structure': 'error',
+			'no-restricted-imports': ['error', {
+				patterns: [{
+					group: ['@/{app,pages,widgets,features,entities}/**'],
+					message: 'shared cannot depend on higher application layers',
+				}],
+			}],
+		},
+	},
+	{
+		files: ['src/entities/**/*.{ts,tsx}'],
+		rules: {
+			'no-restricted-imports': ['error', {
+				patterns: [{
+					group: ['@/{app,pages,widgets,features}/**'],
+					message: 'entities can only depend on entities and shared',
+				}],
+			}],
+		},
+	},
+	{
+		files: ['src/features/**/*.{ts,tsx}'],
+		rules: {
+			'no-restricted-imports': ['error', {
+				patterns: [{
+					group: ['@/{app,pages,widgets}/**'],
+					message: 'features cannot depend on composition layers',
+				}],
+			}],
+		},
+	},
+	{
+		files: ['src/widgets/**/*.{ts,tsx}'],
+		rules: {
+			'no-restricted-imports': ['error', {
+				patterns: [{
+					group: ['@/{app,pages}/**'],
+					message: 'widgets cannot depend on app or pages',
+				}],
+			}],
 		},
 	},
 )

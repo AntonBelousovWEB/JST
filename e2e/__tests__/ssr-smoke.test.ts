@@ -4,49 +4,34 @@ test.describe('SSR / hydration smoke', () => {
 	test('home page renders server-side HTML', async ({ page }) => {
 		await page.route('**/*.{js,mjs}', route => route.abort())
 
-		await page.goto('/')
+		const response = await page.goto('/')
 
-		await expect(page.locator('h1')).toContainText('Frontend starter')
-
-		await expect(page.locator('text=SSR')).toBeVisible()
-		await expect(page.locator('text=DI')).toBeVisible()
+		expect(response?.headers()['referrer-policy']).toBe('strict-origin-when-cross-origin')
+		expect(response?.headers()['x-content-type-options']).toBe('nosniff')
+		await expect(page).toHaveTitle(/\S+/)
+		await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+			'content',
+			/\S+/,
+		)
+		await expect(page.getByRole('main')).toBeVisible()
+		await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 	})
 
 	test('home page hydrates without console errors', async ({ page }) => {
 		const errors: string[] = []
 		page.on('pageerror', error => errors.push(error.message))
+		page.on('console', (message) => {
+			if (message.type() === 'error') {
+				errors.push(message.text())
+			}
+		})
 
 		await page.goto('/')
 
-		await expect(page.locator('text=SSR-ready app shell')).toBeVisible({
+		await expect(page.getByRole('heading', { level: 1 })).toBeVisible({
 			timeout: 10_000,
 		})
 
-		expect(errors.filter(m => !m.includes('ResizeObserver'))).toEqual([])
-	})
-
-	test('selection toggles after hydration', async ({ page }) => {
-		await page.goto('/')
-
-		await expect(page.locator('text=SSR-ready app shell')).toBeVisible({
-			timeout: 10_000,
-		})
-
-		await expect(
-			page.getByText('Nothing selected yet'),
-		).toBeVisible()
-
-		await page.locator('button:has-text("Select example")').first().click()
-
-		await expect(
-			page.getByText('Nothing selected yet'),
-		).not.toBeVisible()
-		await expect(
-			page.getByText('SSR-ready app shell'),
-		).toBeVisible()
-
-		await expect(
-			page.locator('button:has-text("Selected")'),
-		).toBeVisible()
+		expect(errors).toEqual([])
 	})
 })

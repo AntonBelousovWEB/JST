@@ -30,6 +30,10 @@ describe('templateModuleService.getTemplateItems', () => {
 				provide: SELECTED_TEMPLATE_ITEMS_REPOSITORY_TOKEN,
 				useValue: selectedItemsRepoMock,
 			},
+			{
+				provide: TemplateModuleService,
+				useClass: TemplateModuleService,
+			},
 		)
 
 		templateItemsRepoMock.getTemplateItems.mockResolvedValue({
@@ -37,7 +41,7 @@ describe('templateModuleService.getTemplateItems', () => {
 				{
 					id: 1,
 					title: 'SSR-ready app shell',
-					description: 'Server render and hydration entries.',
+					description: 'Framework-managed server render and hydration.',
 					area: 'app',
 					badge: 'SSR',
 				},
@@ -56,6 +60,8 @@ describe('templateModuleService.getTemplateItems', () => {
 		const service = testContainer.get(TemplateModuleService)
 		const result = await service.getTemplateItems('ssr')
 
+		expect(templateItemsRepoMock.getTemplateItems).toHaveBeenCalledWith('ssr')
+		expect(selectedItemsRepoMock.getSelectedItemIds).toHaveBeenCalledOnce()
 		expect(result).toHaveLength(2)
 		expect(result[0].isSelected()).toBe(true)
 		expect(result[1].isSelected()).toBe(false)

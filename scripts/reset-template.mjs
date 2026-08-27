@@ -16,23 +16,27 @@ for (const demoPath of demoPaths) {
 	await rm(resolve(root, demoPath), { force: true, recursive: true })
 }
 
-const homePageDir = resolve(root, 'src/pages/HomePage')
+const homePageDir = resolve(root, 'src/pages/_index')
 
 await mkdir(homePageDir, { recursive: true })
 await writeFile(
-	resolve(homePageDir, 'home.page.tsx'),
+	resolve(homePageDir, 'route.tsx'),
 	`import { Container, Stack, Text, Title } from '@mantine/core'
 
-export function HomePage() {
+export default function HomePage() {
 \treturn (
-\t\t<Container size="sm" py="xl">
-\t\t\t<Stack gap="sm">
-\t\t\t\t<Title order={1}>${toTitle(projectName)}</Title>
-\t\t\t\t<Text c="dimmed">
-\t\t\t\t\tThe starter example has been removed. Begin building your app here.
-\t\t\t\t</Text>
-\t\t\t</Stack>
-\t\t</Container>
+\t\t<>
+\t\t\t<title>${toTitle(projectName)}</title>
+\t\t\t<meta name="description" content="${toTitle(projectName)} web application." />
+\t\t\t<Container size="sm" py="xl">
+\t\t\t\t<Stack gap="sm">
+\t\t\t\t\t<Title order={1}>${toTitle(projectName)}</Title>
+\t\t\t\t\t<Text c="dimmed">
+\t\t\t\t\t\tThe starter example has been removed. Begin building your app here.
+\t\t\t\t\t</Text>
+\t\t\t\t</Stack>
+\t\t\t</Container>
+\t\t</>
 \t)
 }
 `,
@@ -44,7 +48,7 @@ await writeReadme()
 await rm(resolve(root, 'scripts/reset-template.mjs'), { force: true })
 
 console.log(`Template example removed for ${projectName}.`)
-console.log('Start from src/pages/HomePage/home.page.tsx')
+console.log('Start from src/pages/_index/route.tsx')
 
 function getProjectName() {
 	const nameIndex = process.argv.indexOf('--name')
@@ -105,16 +109,30 @@ async function writeReadme() {
 		resolve(root, 'README.md'),
 		`# ${toTitle(projectName)}
 
-React application created from js-template.
+React application created from Frontend Starter.
+
+## Development
+
+\`\`\`bash
+npm ci
+npm run dev
+\`\`\`
 
 ## Scripts
 
-- \`npm run dev\` - SSR dev server.
-- \`npm run dev:spa\` - plain Vite SPA mode.
-- \`npm run build\` - typecheck, client build, and SSR build.
-- \`npm run preview\` - production SSR preview from \`dist\`.
-- \`npm run test:run\` - run Vitest once.
-- \`npm run lint\` - run ESLint.
+- \`npm run dev\` — React Router SSR development server.
+- \`npm run typecheck\` — generate route types and run TypeScript.
+- \`npm run build\` — create production client and server builds.
+- \`npm start\` — serve the production build.
+- \`npm test\` — run Vitest in watch mode.
+- \`npm run test:unit\` — run unit and integration tests once.
+- \`npm run test:e2e\` — run the SSR/hydration smoke tests.
+- \`npm run lint\` — run type-aware ESLint.
+- \`npm run check\` — run the local CI quality gate.
+
+Route modules are discovered from \`src/pages\` at build time. Start the
+application in \`src/pages/_index/route.tsx\` and keep lower layers independent
+of \`app\` and \`pages\`.
 `,
 	)
 }

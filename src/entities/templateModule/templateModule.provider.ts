@@ -5,6 +5,8 @@ import {
 	SELECTED_TEMPLATE_ITEMS_REPOSITORY_TOKEN,
 	TEMPLATE_ITEMS_REPOSITORY_TOKEN,
 } from './repository/types'
+import { TemplateModuleService } from './services/templateModuleService/templateModule.service'
+import { TemplateModuleStore } from './templateModule.store'
 
 export function provider(container: Container) {
 	container.bindAll(
@@ -15,6 +17,14 @@ export function provider(container: Container) {
 		{
 			provide: SELECTED_TEMPLATE_ITEMS_REPOSITORY_TOKEN,
 			useClass: SelectedTemplateItemsStorage,
+		},
+		{
+			provide: TemplateModuleService,
+			useClass: TemplateModuleService,
+		},
+		{
+			provide: TemplateModuleStore,
+			useClass: TemplateModuleStore,
 		},
 	)
 }

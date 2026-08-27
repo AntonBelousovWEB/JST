@@ -6,11 +6,6 @@ export class TemplateItemsBuilder {
 	private items: TemplateItem[] = []
 
 	fromDto(dto: TemplateItemsDTO): TemplateItemsBuilder {
-		if (!dto.items) {
-			this.items = []
-			return this
-		}
-
 		this.items = dto.items.map(item => ({
 			id: item.id,
 			title: item.title,

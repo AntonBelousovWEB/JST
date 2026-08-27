@@ -15,9 +15,12 @@ lerna-debug.log*
 .eslintcache
 .prettiercache
 
-# Directory for compiled output
-dist/
-dist-ssr/
+# Generated and compiled output
+.react-router/
+build/
+coverage/
+playwright-report/
+test-results/
 
 # Dependencies
 node_modules/

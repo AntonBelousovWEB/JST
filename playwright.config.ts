@@ -1,16 +1,22 @@
+import process from 'node:process'
 import { defineConfig, devices } from '@playwright/test'
+
+const isCI = Boolean(process.env.CI)
 
 export default defineConfig({
 	testDir: './e2e/__tests__',
 	fullyParallel: true,
-	forbidOnly: Boolean(process.env.CI),
-	retries: process.env.CI ? 1 : 0,
-	workers: process.env.CI ? 1 : undefined,
-	reporter: process.env.CI ? 'github' : 'list',
+	forbidOnly: isCI,
+	retries: isCI ? 1 : 0,
+	workers: isCI ? 1 : undefined,
+	reporter: isCI
+		? [['github'], ['html', { open: 'never' }]]
+		: 'list',
 	timeout: 30_000,
 
 	use: {
 		baseURL: 'http://localhost:5173',
+		screenshot: 'only-on-failure',
 		trace: 'on-first-retry',
 	},
 
@@ -22,9 +28,10 @@ export default defineConfig({
 	],
 
 	webServer: {
-		command: 'npm run build && npm run preview',
+		command: 'npm run build && npm start',
+		env: { PORT: '5173' },
 		port: 5173,
-		reuseExistingServer: !process.env.CI,
+		reuseExistingServer: !isCI,
 		timeout: 60_000,
 	},
 })

@@ -7,7 +7,7 @@
 		"moduleDetection": "force",
 		"useDefineForClassFields": true,
 
-		"baseUrl": ".",
+		"rootDirs": [".", "./.react-router/types"],
 		"module": "ESNext",
 
 		"moduleResolution": "bundler",
@@ -26,5 +26,5 @@
 		"skipLibCheck": true,
 		"noUncheckedSideEffectImports": true
 	},
-	"include": ["src"]
+	"include": ["src", ".react-router/types/**/*"]
 }

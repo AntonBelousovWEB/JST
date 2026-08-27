@@ -28,7 +28,7 @@ export class LocalStoragePersister implements KeyValueStorage {
 					?? this.memoryStorage.get(storageKey)
 					?? null
 
-			return data ? JSON.parse(data) : null
+			return data ? JSON.parse(data) as T : null
 		}
 		catch (error) {
 			console.error('Storage get error:', error)

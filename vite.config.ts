@@ -1,24 +1,15 @@
 import path from 'node:path'
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { reactRouter } from '@react-router/dev/vite'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-	// Uncomment when API contracts are defined and MSW handlers are registered:
-	// test: {
-	// 	setupFiles: ['./src/shared/api/mocks/setup.ts'],
-	// },
-	plugins: [
-		react({
-			babel: {
-				plugins: [
-					['@babel/plugin-proposal-decorators', { version: '2023-11' }],
-				],
-			},
-		}),
-	],
+	test: {
+		include: ['src/**/*.test.{ts,tsx}'],
+	},
+	plugins: [reactRouter()],
 	resolve: {
 		alias: {
-			'@': path.resolve(__dirname, './src'),
+			'@': path.resolve(import.meta.dirname, './src'),
 		},
 	},
 })

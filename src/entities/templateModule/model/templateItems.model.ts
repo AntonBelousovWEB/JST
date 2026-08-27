@@ -16,8 +16,9 @@ export class TemplateItemsModel {
 	static toggleItemById(items: TemplateItem[], id: number) {
 		const target = items.find(item => item.id === id)
 
-		if (!target)
+		if (!target) {
 			return
+		}
 
 		target.isSelected.set(!target.isSelected())
 	}

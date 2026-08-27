@@ -8,8 +8,9 @@ export class InMemoryCache<T> implements Cache<T> {
 	get(key: string): T | null {
 		const entry = this.cache.get(key)
 
-		if (!entry)
+		if (!entry) {
 			return null
+		}
 
 		const isExpired = Date.now() - entry.timestamp > this.ttl
 

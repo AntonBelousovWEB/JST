@@ -11,7 +11,11 @@ export function useStrictContext<T>(context: Context<T | null>): T {
 	return value
 }
 
-export const createStrictContext = <T>() => createContext<T | null>(null)
+export function createStrictContext<T>() {
+	const StrictContext = createContext<T | null>(null)
+
+	return StrictContext
+}
 
 export function createDi<T>() {
 	const injector = createStrictContext<T>()

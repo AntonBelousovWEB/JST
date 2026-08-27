@@ -23,7 +23,7 @@ export class HttpClient {
 		const searchParams = new URLSearchParams()
 
 		for (const key in params) {
-			if (Object.prototype.hasOwnProperty.call(params, key)) {
+			if (Object.hasOwn(params, key)) {
 				const value = params[key]
 
 				if (Array.isArray(value)) {

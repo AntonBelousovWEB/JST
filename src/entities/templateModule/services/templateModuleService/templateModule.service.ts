@@ -1,5 +1,5 @@
 import type { TemplateItem } from '../../model/types'
-import { inject, injectable } from '@needle-di/core'
+import { inject } from '@needle-di/core'
 import { TemplateItemsBuilder } from '../../model/templateItems.builder'
 import { TemplateItemsModel } from '../../model/templateItems.model'
 import {
@@ -7,7 +7,6 @@ import {
 	TEMPLATE_ITEMS_REPOSITORY_TOKEN,
 } from '../../repository/types'
 
-@injectable()
 export class TemplateModuleService {
 	constructor(
 		private readonly templateItemsRepo = inject(TEMPLATE_ITEMS_REPOSITORY_TOKEN),

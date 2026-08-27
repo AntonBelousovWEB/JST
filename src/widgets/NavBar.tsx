@@ -1,6 +1,6 @@
 import type { Route } from '@/shared/routes'
 import { Anchor, Box, Container, Group, Text } from '@mantine/core'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router'
 import { ROUTES } from '@/shared/routes'
 
 export function NavBar({ routes }: { routes: Route[] }) {
