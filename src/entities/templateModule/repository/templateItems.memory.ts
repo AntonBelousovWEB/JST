@@ -30,7 +30,7 @@ const TEMPLATE_ITEMS: TemplateItemDTO[] = [
 		id: 4,
 		title: 'Shared infrastructure',
 		description:
-			'Storage, HTTP client, routes, and typed helpers live in shared without becoming a custom UI library.',
+			'Storage adapters, route metadata, and focused helpers live in shared without becoming a custom framework.',
 		area: 'shared',
 		badge: 'Infra',
 	},

@@ -1,5 +1,5 @@
 import { reatomComponent } from '@reatom/react'
-import { TemplateItemListOptimized } from '@/entities/templateModule/ui/templateItemListOptimized.component'
+import { TemplateItemList } from '@/entities/templateModule/ui/templateItemList.component'
 import { useTemplateCatalogService } from '../templateCatalog.injector'
 import { CatalogCard } from './catalogCard.component'
 
@@ -9,10 +9,10 @@ export const CatalogList = reatomComponent(() => {
 	} = useTemplateCatalogService()
 
 	return (
-		<TemplateItemListOptimized>
+		<TemplateItemList>
 			{items.data().map(item => (
 				<CatalogCard key={item.id} item={item} />
 			))}
-		</TemplateItemListOptimized>
+		</TemplateItemList>
 	)
 })

@@ -1,4 +1,5 @@
 import antfu from '@antfu/eslint-config'
+import boundaries from '@boundaries/eslint-plugin'
 
 export default antfu(
 	{
@@ -34,46 +35,53 @@ export default antfu(
 		},
 	},
 	{
-		files: ['src/shared/**/*.{ts,tsx}'],
-		rules: {
-			'no-restricted-imports': ['error', {
-				patterns: [{
-					group: ['@/{app,pages,widgets,features,entities}/**'],
-					message: 'shared cannot depend on higher application layers',
-				}],
-			}],
+		files: ['src/{app,pages,widgets,features,entities,shared}/**/*.{ts,tsx}'],
+		plugins: { boundaries },
+		settings: {
+			'import/resolver': {
+				typescript: { project: './tsconfig.json' },
+			},
+			'boundaries/elements': [
+				{ type: 'app', pattern: 'src/app/**' },
+				{ type: 'pages', pattern: 'src/pages/**' },
+				{ type: 'widgets', pattern: 'src/widgets/**' },
+				{ type: 'features', pattern: 'src/features/**' },
+				{ type: 'entities', pattern: 'src/entities/**' },
+				{ type: 'shared', pattern: 'src/shared/**' },
+			],
+			'boundaries/files': [
+				{ category: 'test', pattern: '**/*.{test,spec}.{ts,tsx}' },
+			],
 		},
-	},
-	{
-		files: ['src/entities/**/*.{ts,tsx}'],
 		rules: {
-			'no-restricted-imports': ['error', {
-				patterns: [{
-					group: ['@/{app,pages,widgets,features}/**'],
-					message: 'entities can only depend on entities and shared',
-				}],
-			}],
-		},
-	},
-	{
-		files: ['src/features/**/*.{ts,tsx}'],
-		rules: {
-			'no-restricted-imports': ['error', {
-				patterns: [{
-					group: ['@/{app,pages,widgets}/**'],
-					message: 'features cannot depend on composition layers',
-				}],
-			}],
-		},
-	},
-	{
-		files: ['src/widgets/**/*.{ts,tsx}'],
-		rules: {
-			'no-restricted-imports': ['error', {
-				patterns: [{
-					group: ['@/{app,pages}/**'],
-					message: 'widgets cannot depend on app or pages',
-				}],
+			'boundaries/dependencies': ['error', {
+				default: 'disallow',
+				policies: [
+					{
+						from: { file: { categories: 'test' } },
+						allow: { to: { element: { types: { anyOf: ['app', 'pages', 'widgets', 'features', 'entities', 'shared'] } } } },
+					},
+					{
+						from: { element: { types: { anyOf: ['app', 'pages'] } } },
+						allow: { to: { element: { types: { anyOf: ['app', 'pages', 'widgets', 'features', 'entities', 'shared'] } } } },
+					},
+					{
+						from: { element: { type: 'widgets' } },
+						allow: { to: { element: { types: { anyOf: ['widgets', 'features', 'entities', 'shared'] } } } },
+					},
+					{
+						from: { element: { type: 'features' } },
+						allow: { to: { element: { types: { anyOf: ['features', 'entities', 'shared'] } } } },
+					},
+					{
+						from: { element: { type: 'entities' } },
+						allow: { to: { element: { types: { anyOf: ['entities', 'shared'] } } } },
+					},
+					{
+						from: { element: { type: 'shared' } },
+						allow: { to: { element: { type: 'shared' } } },
+					},
+				],
 			}],
 		},
 	},

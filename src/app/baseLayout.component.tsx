@@ -7,7 +7,7 @@ export function BaseLayout() {
 	return (
 		<>
 			<NavBar routes={getRoutes()} />
-			<Container component="main" size="lg">
+			<Container component="main" id="main-content" tabIndex={-1} size="lg">
 				<Outlet />
 			</Container>
 		</>

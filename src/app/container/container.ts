@@ -1,4 +1,4 @@
-import type { ProviderFn, ProviderModule } from './types'
+import type { ProviderModule } from './types'
 import { Container } from '@needle-di/core'
 
 const providerModules = import.meta.glob<ProviderModule>([
@@ -9,21 +9,16 @@ const providerModules = import.meta.glob<ProviderModule>([
 	eager: true,
 })
 
-function isProviderFn(fn: unknown): fn is ProviderFn {
-	return typeof fn === 'function' && fn.length === 1
-}
-
 export function createAppContainer() {
 	const container = new Container()
 
-	Object.entries(providerModules).forEach(([modulePath, module]) => {
-		if ('provider' in module && isProviderFn(module.provider)) {
-			module.provider(container)
+	for (const [modulePath, module] of Object.entries(providerModules)) {
+		if (typeof module.provider !== 'function') {
+			throw new TypeError(`[DI] Invalid provider module: ${modulePath}`)
 		}
-		else {
-			console.log(`[DI] Skipped invalid provider module: ${modulePath}`)
-		}
-	})
+
+		module.provider(container)
+	}
 
 	return container
 }

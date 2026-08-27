@@ -3,7 +3,7 @@ import { createContext, use } from 'react'
 
 export const AppContainerContext = createContext<Container | null>(null)
 
-export function useAppContainer() {
+function useAppContainer() {
 	const container = use(AppContainerContext)
 
 	if (!container) {

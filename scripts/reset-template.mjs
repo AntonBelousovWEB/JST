@@ -5,11 +5,14 @@ import { fileURLToPath } from 'node:url'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const projectName = getProjectName()
+const demoDependencies = ['@reatom/core', '@reatom/react']
 
 const demoPaths = [
 	'src/entities/templateModule',
 	'src/features/templateCatalog',
 	'src/shared/dto/templateItemDto.types.ts',
+	'src/shared/lib/react.ts',
+	'e2e/template-catalog',
 ]
 
 for (const demoPath of demoPaths) {
@@ -39,6 +42,15 @@ export default function HomePage() {
 \t\t</>
 \t)
 }
+`,
+)
+
+await writeFile(
+	resolve(root, 'src/app/container/container.context.ts'),
+	`import type { Container } from '@needle-di/core'
+import { createContext } from 'react'
+
+export const AppContainerContext = createContext<Container | null>(null)
 `,
 )
 
@@ -88,6 +100,9 @@ async function updatePackageJson() {
 
 	packageJson.name = projectName
 	delete packageJson.scripts['template:reset']
+	for (const dependency of demoDependencies) {
+		delete packageJson.dependencies[dependency]
+	}
 
 	await writeJson(packageJsonPath, packageJson)
 }
@@ -99,6 +114,10 @@ async function updatePackageLock() {
 	packageLock.name = projectName
 	if (packageLock.packages?.['']) {
 		packageLock.packages[''].name = projectName
+		for (const dependency of demoDependencies) {
+			delete packageLock.packages[''].dependencies?.[dependency]
+			delete packageLock.packages[`node_modules/${dependency}`]
+		}
 	}
 
 	await writeJson(packageLockPath, packageLock)
@@ -126,13 +145,15 @@ npm run dev
 - \`npm start\` — serve the production build.
 - \`npm test\` — run Vitest in watch mode.
 - \`npm run test:unit\` — run unit and integration tests once.
-- \`npm run test:e2e\` — run the SSR/hydration smoke tests.
+- \`npm run test:e2e\` — run the SSR, route-error, hydration, and accessibility smoke tests.
 - \`npm run lint\` — run type-aware ESLint.
+- \`npm run knip\` — find unused files, exports, and dependencies.
 - \`npm run check\` — run the local CI quality gate.
 
 Route modules are discovered from \`src/pages\` at build time. Start the
 application in \`src/pages/_index/route.tsx\` and keep lower layers independent
-of \`app\` and \`pages\`.
+of \`app\` and \`pages\`. Add Playwright tests by product area under \`e2e/\`;
+keep universal SSR and accessibility checks in \`e2e/smoke/\`.
 `,
 	)
 }

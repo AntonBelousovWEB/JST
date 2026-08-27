@@ -1,7 +1,7 @@
 import type { Context } from 'react'
 import { createContext, use } from 'react'
 
-export function useStrictContext<T>(context: Context<T | null>): T {
+function useStrictContext<T>(context: Context<T | null>): T {
 	const value = use(context)
 
 	if (value === null) {
@@ -11,7 +11,7 @@ export function useStrictContext<T>(context: Context<T | null>): T {
 	return value
 }
 
-export function createStrictContext<T>() {
+function createStrictContext<T>() {
 	const StrictContext = createContext<T | null>(null)
 
 	return StrictContext

@@ -4,7 +4,8 @@ import { defineConfig, devices } from '@playwright/test'
 const isCI = Boolean(process.env.CI)
 
 export default defineConfig({
-	testDir: './e2e/__tests__',
+	testDir: './e2e',
+	testMatch: '**/*.spec.ts',
 	fullyParallel: true,
 	forbidOnly: isCI,
 	retries: isCI ? 1 : 0,
@@ -28,7 +29,7 @@ export default defineConfig({
 	],
 
 	webServer: {
-		command: 'npm run build && npm start',
+		command: isCI ? 'npm start' : 'npm run build && npm start',
 		env: { PORT: '5173' },
 		port: 5173,
 		reuseExistingServer: !isCI,

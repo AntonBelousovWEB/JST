@@ -12,9 +12,7 @@ implements SelectedTemplateItemsRepository {
 
 	constructor(
 		private readonly storage: KeyValueStorage = inject(KEY_VALUE_STORAGE_TOKEN),
-	) {
-		void this.setInitialValue()
-	}
+	) {}
 
 	async getSelectedItemIds() {
 		const result
@@ -47,10 +45,5 @@ implements SelectedTemplateItemsRepository {
 
 	private isSelected(id: TemplateItem['id']) {
 		return this.selectedIds.includes(id)
-	}
-
-	private async setInitialValue() {
-		this.selectedIds
-			= (await this.storage.get<TemplateItem['id'][]>(SELECTED_ITEMS_KEY)) ?? []
 	}
 }

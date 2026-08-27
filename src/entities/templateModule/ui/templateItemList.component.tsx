@@ -1,15 +1,14 @@
-import type { TemplateItemListProps } from './templateItemList.types'
+import type { ReactNode } from 'react'
 import { SimpleGrid } from '@mantine/core'
 
 export function TemplateItemList({
-	items,
-	renderItem,
-}: TemplateItemListProps) {
+	children,
+}: {
+	children: ReactNode
+}) {
 	return (
 		<SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md" mt="lg">
-			{items.map(item => (
-				<div key={item.id}>{renderItem(item)}</div>
-			))}
+			{children}
 		</SimpleGrid>
 	)
 }

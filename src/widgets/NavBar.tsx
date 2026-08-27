@@ -14,7 +14,7 @@ export function NavBar({ routes }: { routes: Route[] }) {
 						</Text>
 					</Anchor>
 
-					<Group gap="xs">
+					<Group component="nav" aria-label="Primary navigation" gap="xs">
 						{routes.map(route => (
 							<Anchor
 								key={route.path}

@@ -13,7 +13,7 @@ It uses React Router Framework Mode for SSR instead of a hand-written server. Th
 - Mantine UI
 - Needle DI with one container per rendered application
 - Vitest and Playwright
-- ESLint, lint-staged, Husky, and GitHub Actions
+- ESLint architecture rules, Knip, lint-staged, Husky, and GitHub Actions
 
 ## Quick start
 
@@ -32,7 +32,7 @@ To turn the repository into a clean application, remove the demonstration domain
 npm run template:reset -- --name my-product
 ```
 
-The reset is intentionally one-way. Run it on a fresh branch or immediately after creating a repository from this template.
+The reset is intentionally one-way. Run it on a fresh branch or immediately after creating a repository from this template. It removes the catalog-specific E2E suite and Reatom dependencies with the example, while preserving the SSR, DI, layer, and universal smoke-test foundations.
 
 ## Architecture
 
@@ -46,7 +46,7 @@ src/
 └── shared/       framework-independent infrastructure and utilities
 ```
 
-Higher layers may depend on lower layers, never the reverse. ESLint enforces the important boundaries:
+Higher layers may depend on lower layers, never the reverse. ESLint resolves both aliases and relative imports before enforcing the boundaries:
 
 - `shared` cannot import application or domain layers;
 - `entities` can depend only on `entities` and `shared`;
@@ -97,13 +97,15 @@ The example uses the stable Reatom packages. Stores stay in the owning entity an
 | `npm run test:e2e` | Build and run Playwright SSR/hydration tests |
 | `npm run lint` | Run cached, type-aware ESLint with zero warnings |
 | `npm run lint:fix` | Apply safe ESLint fixes |
+| `npm run knip` | Find unused files, exports, and dependencies |
 | `npm run check` | Run the local CI quality gate |
 | `npm run template:reset -- --name <name>` | Remove the example domain and rename the app |
 
 ## Quality gates
 
 - Vitest collects only `src/**/*.test.{ts,tsx}`.
-- Playwright verifies usable server-rendered HTML with JavaScript disabled and clean client hydration.
+- Playwright verifies usable server-rendered HTML with JavaScript disabled, route errors, clean hydration, keyboard bypass navigation, and automated accessibility checks with Axe.
+- Knip keeps dead files, exports, and dependencies out of the template.
 - Pre-commit checks operate only on staged files; the full gate runs in CI.
 - GitHub Actions runs lint, unit tests, type checking, the production build, and Chromium E2E tests.
 - Dependabot proposes weekly npm and GitHub Actions updates.
@@ -114,6 +116,19 @@ Run the complete local gate before opening a pull request:
 npm run check
 npm run test:e2e
 ```
+
+### E2E organization
+
+Group scenarios by product area instead of putting every test in one directory:
+
+```text
+e2e/
+├── smoke/                 universal SSR, errors, hydration, and accessibility checks
+├── checkout/              checkout journeys
+└── account-settings/      account journeys
+```
+
+Use `*.spec.ts` files and Playwright's role- or label-based locators. Keep a workflow in the spec until selectors or actions are genuinely shared by several scenarios; only then extract a fixture or page object. The removable example follows the same rule in `e2e/template-catalog/`, and `template:reset` removes that directory while preserving the universal smoke suite.
 
 ## Production
 
@@ -132,3 +147,7 @@ There is no auth framework, API client policy, mock server, analytics SDK, or en
 - Partytown only helps after real third-party scripts measurably block the main thread.
 - Unhead duplicates React 19 and React Router metadata handling.
 - Helmet is Express middleware; this template uses React Router response headers and has no custom Express server.
+
+## Contributing and security
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the change workflow. Report vulnerabilities according to [`SECURITY.md`](SECURITY.md), never in a public issue.

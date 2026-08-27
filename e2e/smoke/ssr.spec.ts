@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
-test.describe('SSR / hydration smoke', () => {
-	test('home page renders server-side HTML', async ({ page }) => {
+test.describe('SSR / hydration', () => {
+	test('renders usable server-side HTML without JavaScript', async ({ page }) => {
 		await page.route('**/*.{js,mjs}', route => route.abort())
 
 		const response = await page.goto('/')
@@ -17,7 +17,7 @@ test.describe('SSR / hydration smoke', () => {
 		await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 	})
 
-	test('home page hydrates without console errors', async ({ page }) => {
+	test('hydrates without browser errors', async ({ page }) => {
 		const errors: string[] = []
 		page.on('pageerror', error => errors.push(error.message))
 		page.on('console', (message) => {
@@ -27,10 +27,7 @@ test.describe('SSR / hydration smoke', () => {
 		})
 
 		await page.goto('/')
-
-		await expect(page.getByRole('heading', { level: 1 })).toBeVisible({
-			timeout: 10_000,
-		})
+		await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 
 		expect(errors).toEqual([])
 	})

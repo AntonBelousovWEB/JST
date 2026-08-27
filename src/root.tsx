@@ -30,6 +30,7 @@ export function Layout({ children }: { children: ReactNode }) {
 				<Links />
 			</head>
 			<body>
+				<a className="skip-link" href="#main-content">Skip to content</a>
 				{children}
 				<ScrollRestoration />
 				<Scripts />
@@ -58,7 +59,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 		<>
 			<title>{title}</title>
 			<meta name="robots" content="noindex" />
-			<main>
+			<main id="main-content" tabIndex={-1}>
 				<h1>{notFound ? '404' : 'Something went wrong'}</h1>
 				<p>{notFound ? 'The requested page was not found.' : 'Please try again later.'}</p>
 			</main>
