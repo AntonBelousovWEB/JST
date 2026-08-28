@@ -10,6 +10,7 @@ export const CatalogInput = reatomComponent(() => {
 
 	return (
 		<TextInput
+			classNames={{ input: 'catalog-search__input', label: 'catalog-search__label' }}
 			label="Explore the starter"
 			placeholder="Search app, entities, features, shared..."
 			value={search()}

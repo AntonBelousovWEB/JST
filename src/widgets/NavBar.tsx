@@ -8,11 +8,13 @@ export function NavBar({ items }: { items: NavigationItem[] }) {
 	return (
 		<Box component="header" className="app-header">
 			<Container size="lg">
-				<Group h={64} justify="space-between">
+				<Group h={68} justify="space-between">
 					<Anchor component={Link} to="/" underline="never">
-						<Group component="span" gap="xs" wrap="nowrap">
-							<SvgIcon name="app" width={20} height={20} />
-							<Text fw={800} c="dark">{APP_CONFIG.name}</Text>
+						<Group component="span" gap="sm" wrap="nowrap">
+							<span className="app-header__mark">
+								<SvgIcon name="app" width={18} height={18} />
+							</span>
+							<Text fw={650} c="var(--color-text)" size="sm">{APP_CONFIG.name}</Text>
 						</Group>
 					</Anchor>
 

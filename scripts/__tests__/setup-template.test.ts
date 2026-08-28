@@ -53,6 +53,11 @@ it('creates a configured clean product', async () => {
 		expect(await readFile(resolve(fixtureRoot, 'src/app/container/container.context.ts'), 'utf8'))
 			.toContain('export const useService')
 		await expect(access(resolve(fixtureRoot, 'src/entities/templateModule'))).rejects.toThrow()
+		await expect(access(resolve(fixtureRoot, 'src/entities/post'))).rejects.toThrow()
+		await expect(access(resolve(fixtureRoot, 'src/pages/_index/home.page.tsx'))).rejects.toThrow()
+		await expect(access(resolve(fixtureRoot, 'e2e/posts-feed'))).rejects.toThrow()
+		await expect(access(resolve(fixtureRoot, 'src/shared/api'))).rejects.toThrow()
+		await expect(access(resolve(fixtureRoot, 'skills/frontend-architecture/SKILL.md'))).resolves.toBeUndefined()
 		await expect(access(resolve(fixtureRoot, 'scripts/__tests__'))).rejects.toThrow()
 		await expect(access(resolve(fixtureRoot, 'scripts/setup-template.mjs'))).rejects.toThrow()
 	}
@@ -78,6 +83,8 @@ it('can retain the working example domain', async () => {
 		expect(packageJson.name).toBe('catalog-lab')
 		expect(packageJson.dependencies).toHaveProperty('@reatom/core')
 		await expect(access(resolve(fixtureRoot, 'src/entities/templateModule'))).resolves.toBeUndefined()
+		await expect(access(resolve(fixtureRoot, 'src/entities/post'))).resolves.toBeUndefined()
+		await expect(access(resolve(fixtureRoot, 'e2e/posts-feed'))).resolves.toBeUndefined()
 		await expect(access(resolve(fixtureRoot, 'e2e/template-catalog'))).resolves.toBeUndefined()
 	}
 	finally {

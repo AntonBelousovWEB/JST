@@ -7,7 +7,7 @@ export function TemplateItemList({
 	children: ReactNode
 }) {
 	return (
-		<SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md" mt="lg">
+		<SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
 			{children}
 		</SimpleGrid>
 	)

@@ -1,13 +1,8 @@
 import type { Container } from '@needle-di/core'
 import type { ReactNode } from 'react'
-import { createTheme, MantineProvider } from '@mantine/core'
-import { APP_CONFIG } from '@/shared/config'
+import { MantineProvider } from '@mantine/core'
 import { AppContainerProvider } from './container/container.provider'
-
-const theme = createTheme({
-	autoContrast: true,
-	primaryColor: APP_CONFIG.primaryColor,
-})
+import { appColorScheme, forcedColorScheme, theme } from './theme'
 
 export function AppProviders({
 	container,
@@ -18,7 +13,11 @@ export function AppProviders({
 }) {
 	return (
 		<AppContainerProvider container={container}>
-			<MantineProvider defaultColorScheme={APP_CONFIG.colorScheme} theme={theme}>
+			<MantineProvider
+				defaultColorScheme={appColorScheme}
+				forceColorScheme={forcedColorScheme}
+				theme={theme}
+			>
 				{children}
 			</MantineProvider>
 		</AppContainerProvider>

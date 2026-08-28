@@ -26,10 +26,17 @@ const primaryColors = [
 const demoDependencies = ['@reatom/core', '@reatom/react']
 const templateOnlyPaths = ['AUDIT.md', 'scripts/__tests__']
 const demoPaths = [
+	'src/entities/post',
 	'src/entities/templateModule',
+	'src/features/postsFeed',
 	'src/features/templateCatalog',
+	'src/pages/_index/home.css',
+	'src/pages/_index/home.page.tsx',
+	'src/shared/api',
+	'src/shared/dto/postDto.types.ts',
 	'src/shared/dto/templateItemDto.types.ts',
 	'src/shared/lib/react.ts',
+	'e2e/posts-feed',
 	'e2e/template-catalog',
 ]
 
@@ -77,12 +84,12 @@ async function resolveOptions(values) {
 		const title = values.title ?? packageNameToTitle(name)
 
 		return {
-			colorScheme: values['color-scheme'] ?? 'light',
+			colorScheme: values['color-scheme'] ?? 'dark',
 			demo: values.demo ?? 'remove',
 			description: values.description ?? `${title} web application.`,
 			language: values.lang ?? 'en',
 			name,
-			primaryColor: values['primary-color'] ?? 'blue',
+			primaryColor: values['primary-color'] ?? 'violet',
 			title,
 		}
 	}
@@ -94,12 +101,12 @@ async function resolveOptions(values) {
 		const title = values.title ?? await ask(prompts, 'Application title', packageNameToTitle(name))
 
 		return {
-			colorScheme: values['color-scheme'] ?? await ask(prompts, `Color scheme (${colorSchemes.join('/')})`, 'light'),
+			colorScheme: values['color-scheme'] ?? await ask(prompts, `Color scheme (${colorSchemes.join('/')})`, 'dark'),
 			demo: values.demo ?? await ask(prompts, 'Example domain (remove/keep)', 'remove'),
 			description: values.description ?? await ask(prompts, 'SEO description', `${title} web application.`),
 			language: values.lang ?? await ask(prompts, 'Document language', 'en'),
 			name,
-			primaryColor: values['primary-color'] ?? await ask(prompts, `Mantine primary color (${primaryColors.join('/')})`, 'blue'),
+			primaryColor: values['primary-color'] ?? await ask(prompts, `Mantine primary color (${primaryColors.join('/')})`, 'violet'),
 			title,
 		}
 	}
@@ -161,7 +168,7 @@ async function writeCleanHomePage() {
 	await mkdir(homePageDir, { recursive: true })
 	await writeFile(
 		resolve(homePageDir, 'route.tsx'),
-		`import { Container, Stack, Text, Title } from '@mantine/core'
+		`import { Stack, Text, Title } from '@mantine/core'
 import { APP_CONFIG } from '@/shared/config'
 
 export default function HomePage() {
@@ -169,14 +176,12 @@ export default function HomePage() {
 \t\t<>
 \t\t\t<title>{APP_CONFIG.name}</title>
 \t\t\t<meta name="description" content={APP_CONFIG.description} />
-\t\t\t<Container size="sm" py="xl">
-\t\t\t\t<Stack gap="sm">
-\t\t\t\t\t<Title order={1}>{APP_CONFIG.name}</Title>
-\t\t\t\t\t<Text c="dimmed">
-\t\t\t\t\t\tThe starter example has been removed. Begin building your app here.
-\t\t\t\t\t</Text>
-\t\t\t\t</Stack>
-\t\t\t</Container>
+\t\t\t<Stack gap="sm" py="xl">
+\t\t\t\t<Title order={1}>{APP_CONFIG.name}</Title>
+\t\t\t\t<Text c="dimmed">
+\t\t\t\t\tThe starter example has been removed. Begin building your app here.
+\t\t\t\t</Text>
+\t\t\t</Stack>
 \t\t</>
 \t)
 }
@@ -277,6 +282,8 @@ npm run dev
   from \`src/shared/ui/SvgIcon.tsx\`. Nested directories become name prefixes.
 - Group Playwright specs by product area under \`e2e/\`; universal checks stay
   in \`e2e/smoke/\`.
+- Follow \`skills/frontend-architecture/SKILL.md\` when adding a vertical slice
+  or reviewing layer boundaries.
 
 Run one unit file with \`npm run test:unit -- path/to/file.test.ts\` and one E2E
 file with \`npm run test:e2e -- e2e/area/flow.spec.ts\`.

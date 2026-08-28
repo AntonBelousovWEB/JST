@@ -1,0 +1,29 @@
+.template-item-card {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--color-border);
+	background: var(--color-bg-subtle);
+	transition: 180ms ease;
+	transition-property: background, border-color;
+}
+
+.template-item-card:hover {
+	border-color: var(--color-border-strong);
+	background: var(--color-surface);
+}
+
+.template-item-card__area {
+	color: var(--color-text-faint);
+	letter-spacing: 0.07em;
+}
+
+.template-item-card__title {
+	color: var(--color-text);
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.template-item-card__description {
+	color: var(--color-text-muted);
+	line-height: 1.6;
+}

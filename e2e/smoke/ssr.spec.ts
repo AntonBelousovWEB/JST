@@ -9,6 +9,7 @@ test.describe('SSR / hydration', () => {
 		expect(response?.headers()['referrer-policy']).toBe('strict-origin-when-cross-origin')
 		expect(response?.headers()['x-content-type-options']).toBe('nosniff')
 		await expect(page.locator('html')).toHaveAttribute('lang', /\S+/)
+		await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
 		await expect(page).toHaveTitle(/\S+/)
 		await expect(page.locator('meta[name="description"]')).toHaveAttribute(
 			'content',
@@ -31,6 +32,7 @@ test.describe('SSR / hydration', () => {
 
 		await page.goto('/')
 		await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+		await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
 
 		expect(errors).toEqual([])
 	})

@@ -2,7 +2,7 @@
 
 A production-oriented React starter for applications that need server rendering, explicit architectural boundaries, and a small but serious delivery pipeline.
 
-It uses React Router Framework Mode for SSR instead of a hand-written server. The example domain shows how pages, features, entities, repositories, stores, DI, persistence, and UI fit together; remove it with one command when starting a real product.
+It uses React Router Framework Mode for SSR instead of a hand-written server. The removable reference application shows local persistence and a real JSONPlaceholder request flowing through pages, features, entities, repositories, services, view-model stores, DI, and UI.
 
 ## Stack
 
@@ -13,6 +13,7 @@ It uses React Router Framework Mode for SSR instead of a hand-written server. Th
 - Mantine UI
 - SSR-compatible file-based SVG sprite generation
 - Needle DI with one container per rendered application
+- Shared HTTP client over native Fetch with explicit repository boundaries
 - Vitest and Playwright
 - ESLint architecture rules, Knip, lint-staged, Husky, and GitHub Actions
 
@@ -110,6 +111,25 @@ Decorative icons are hidden from assistive technology; providing `aria-label` gi
 
 The example uses the stable Reatom packages. Stores stay in the owning entity and expose state and operations to features; React components subscribe through `reatomComponent`.
 
+### Remote data flow
+
+The posts example deliberately keeps the network slice concrete and removable:
+
+```text
+page composition
+  → posts feature
+    → Reatom view-model store
+      → domain service and DTO mapper
+        → repository port
+          → JSONPlaceholder adapter
+```
+
+The shared HTTP client owns URL construction, query serialization, headers, JSON parsing, and HTTP failure handling. The entity adapter declares only the endpoint and DTO response contract. The service converts DTOs into the domain model, so transport fields never reach UI. Product-specific authentication, retries, runtime schemas, and caching remain opt-in because their policies depend on the real backend.
+
+### AI architecture guidance
+
+[`skills/frontend-architecture/SKILL.md`](skills/frontend-architecture/SKILL.md) is the compact source of truth for coding agents. It defines layer ownership, the DTO/repository/service/view-model flow, and the boundary between useful dependency injection and unnecessary indirection. [`AGENTS.md`](AGENTS.md) points repository-aware agents to it automatically.
+
 ## Commands
 
 | Command | Purpose |
@@ -130,7 +150,7 @@ The example uses the stable Reatom packages. Stores stay in the owning entity an
 ## Quality gates
 
 - Vitest collects colocated application tests and tooling tests under `scripts/**/__tests__`.
-- Playwright verifies usable server-rendered HTML with JavaScript disabled, route errors, clean hydration, keyboard bypass navigation, and automated accessibility checks with Axe.
+- Playwright verifies usable server-rendered HTML with JavaScript disabled, a stable initial color scheme, route errors, clean hydration, the live API success/error flow, keyboard bypass navigation, and automated accessibility checks with Axe.
 - Knip keeps dead files, exports, and dependencies out of the template.
 - Pre-commit checks operate only on staged files; the full gate runs in CI.
 - GitHub Actions runs lint, unit tests, type checking, the production build, and Chromium E2E tests.
@@ -167,7 +187,7 @@ Deploy `build/`, `package.json`, `package-lock.json`, and production dependencie
 
 ## Deliberate omissions
 
-There is no auth framework, API client policy, mock server, analytics SDK, or environment schema in the base template. Add those after the product has a real contract for them; speculative infrastructure makes starters harder to remove and easier to misuse.
+There is no auth framework, mock server, analytics SDK, runtime schema library, or environment schema in the base template. Add those after the product has a real contract for them; speculative infrastructure makes starters harder to remove and easier to misuse.
 
 - A service worker needs an explicit offline/update/cache policy and tests; a generic cache can serve stale SSR or authenticated responses.
 - Partytown only helps after real third-party scripts measurably block the main thread.
