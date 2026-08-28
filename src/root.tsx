@@ -8,9 +8,11 @@ import {
 	Scripts,
 	ScrollRestoration,
 } from 'react-router'
+import svgSprite from 'virtual:svg-icons/sprite'
 import { AppProviders } from './app/app.component'
 import { BaseLayout } from './app/baseLayout.component'
 import { createAppContainer } from './app/container/container'
+import { APP_CONFIG } from './shared/config'
 import '@mantine/core/styles.css'
 import './index.css'
 
@@ -22,14 +24,18 @@ export const headers: Route.HeadersFunction = () => ({
 
 export function Layout({ children }: { children: ReactNode }) {
 	return (
-		<html lang="en">
+		<html lang={APP_CONFIG.language}>
 			<head>
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
+				<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 				<Meta />
 				<Links />
 			</head>
 			<body>
+				{/* SVG content is compiled from repository-owned files during the Vite build. */}
+				{/* eslint-disable-next-line react/dom-no-dangerously-set-innerhtml */}
+				<div aria-hidden="true" dangerouslySetInnerHTML={{ __html: svgSprite }} />
 				<a className="skip-link" href="#main-content">Skip to content</a>
 				{children}
 				<ScrollRestoration />
@@ -51,9 +57,7 @@ export default function Root() {
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 	const notFound = isRouteErrorResponse(error) && error.status === 404
-	const title = notFound
-		? 'Page not found | Frontend Starter'
-		: 'Error | Frontend Starter'
+	const title = `${notFound ? 'Page not found' : 'Error'} | ${APP_CONFIG.name}`
 
 	return (
 		<>

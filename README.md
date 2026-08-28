@@ -11,6 +11,7 @@ It uses React Router Framework Mode for SSR instead of a hand-written server. Th
 - Vite
 - Reatom stable
 - Mantine UI
+- SSR-compatible file-based SVG sprite generation
 - Needle DI with one container per rendered application
 - Vitest and Playwright
 - ESLint architecture rules, Knip, lint-staged, Husky, and GitHub Actions
@@ -26,13 +27,21 @@ npm run dev
 
 The development server is available at `http://localhost:5173` with SSR, HMR, and route type generation.
 
-To turn the repository into a clean application, remove the demonstration domain and rename the package:
+Configure a new application interactively:
 
 ```bash
-npm run template:reset -- --name my-product
+npm run template:setup
 ```
 
-The reset is intentionally one-way. Run it on a fresh branch or immediately after creating a repository from this template. It removes the catalog-specific E2E suite and Reatom dependencies with the example, while preserving the SSR, DI, layer, and universal smoke-test foundations.
+The setup is intentionally one-way. It configures the package/display name, SEO description, document language, Mantine color scheme and primary color, and whether to retain the working example. Every choice also has a non-interactive flag:
+
+```bash
+npm run template:setup -- --yes --name my-product --title "My Product" \
+  --description "My product description." --lang en \
+  --color-scheme auto --primary-color violet --demo remove
+```
+
+Run `npm run template:setup -- --help` for the complete CLI reference.
 
 ## Architecture
 
@@ -68,6 +77,8 @@ src/pages/
 
 Keep route-local components and tests next to `route.tsx`; only the route module is discovered. The `@/` alias keeps cross-layer imports stable, while relative imports remain local to a route folder.
 
+Add an optional `navigation.ts` beside a route when it should appear in the primary navigation. [`src/app/navigation.ts`](src/app/navigation.ts) discovers only these small metadata modules at build time, so adding a page never requires editing a central registry and does not eagerly import route code.
+
 React Router owns the development server, client/server builds, HTTP responses, hydration, route errors, and production serving. [`src/root.tsx`](src/root.tsx) owns only the document shell and application providers. This keeps transport concerns out of the domain layers and avoids maintaining a second, partial web framework in the repository.
 
 ### Metadata and response security
@@ -79,6 +90,21 @@ The root route sends safe, origin-independent browser headers. Content Security 
 ### Dependency injection
 
 [`src/app/container/container.ts`](src/app/container/container.ts) discovers `*.provider.ts` modules and builds a fresh container for each server render. The hydrated browser application keeps its container for the lifetime of the app. Tests can replace bindings through a child container.
+
+Each discovered module default-exports a provider function. React code resolves a token with `useService` from [`src/app/container/container.context.ts`](src/app/container/container.context.ts). Product metadata and theme defaults live together in [`src/shared/config.ts`](src/shared/config.ts); `template:setup` writes them from validated CLI answers.
+
+### SVG icons
+
+Put repository-owned icons under `src/shared/assets/icons`. The maintained `vite-plugin-svg-icons-ng` successor compiles them into a cached sprite, fails the build on broken or duplicate icons, and exposes the sprite to the React Router document shell during SSR. Render an icon with the accessible-by-default [`SvgIcon`](src/shared/ui/SvgIcon.tsx):
+
+```tsx
+<>
+	<SvgIcon name="app" />
+	<SvgIcon name="actions-save" aria-label="Save" />
+</>
+```
+
+Decorative icons are hidden from assistive technology; providing `aria-label` gives the SVG image semantics. Nested folders become name prefixes. The sprite is present in server HTML, so icons do not wait for hydration or an extra request.
 
 ### State
 
@@ -99,11 +125,11 @@ The example uses the stable Reatom packages. Stores stay in the owning entity an
 | `npm run lint:fix` | Apply safe ESLint fixes |
 | `npm run knip` | Find unused files, exports, and dependencies |
 | `npm run check` | Run the local CI quality gate |
-| `npm run template:reset -- --name <name>` | Remove the example domain and rename the app |
+| `npm run template:setup` | Configure the product interactively or through flags |
 
 ## Quality gates
 
-- Vitest collects only `src/**/*.test.{ts,tsx}`.
+- Vitest collects colocated application tests and tooling tests under `scripts/**/__tests__`.
 - Playwright verifies usable server-rendered HTML with JavaScript disabled, route errors, clean hydration, keyboard bypass navigation, and automated accessibility checks with Axe.
 - Knip keeps dead files, exports, and dependencies out of the template.
 - Pre-commit checks operate only on staged files; the full gate runs in CI.
@@ -128,7 +154,7 @@ e2e/
 └── account-settings/      account journeys
 ```
 
-Use `*.spec.ts` files and Playwright's role- or label-based locators. Keep a workflow in the spec until selectors or actions are genuinely shared by several scenarios; only then extract a fixture or page object. The removable example follows the same rule in `e2e/template-catalog/`, and `template:reset` removes that directory while preserving the universal smoke suite.
+Use `*.spec.ts` files and Playwright's role- or label-based locators. Keep a workflow in the spec until selectors or actions are genuinely shared by several scenarios; only then extract a fixture or page object. The removable example follows the same rule in `e2e/template-catalog/`, and clean setup removes that directory while preserving the universal smoke suite.
 
 ## Production
 

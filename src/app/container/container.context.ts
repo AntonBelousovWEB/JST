@@ -13,4 +13,8 @@ function useAppContainer() {
 	return container
 }
 
+/**
+ * Feature and page integration point.
+ * @public
+ */
 export const useService = <T>(token: Token<T>) => useAppContainer().get(token)

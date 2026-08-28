@@ -6,6 +6,7 @@ import { useService } from '@/app/container/container.context'
 import { TemplateModuleStore } from '@/entities/templateModule/templateModule.store'
 import { TemplateCatalogEntry } from '@/features/templateCatalog/templateCatalog.entry'
 import { TemplateCatalogInjector } from '@/features/templateCatalog/templateCatalog.injector'
+import { APP_CONFIG } from '@/shared/config'
 
 const subscribe = () => () => {}
 const getClientSnapshot = () => true
@@ -15,8 +16,7 @@ const HomePage = reatomComponent(() => {
 	const templateModuleStore = useService(TemplateModuleStore)
 	const hydrated = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot)
 	const selectedItems = hydrated ? templateModuleStore.selectedItems() : []
-	const title = 'Frontend Starter'
-	const description = 'Production-ready React starter with SSR, DI, layered architecture, tests, and Mantine UI.'
+	const { description, name: title } = APP_CONFIG
 
 	return (
 		<>
