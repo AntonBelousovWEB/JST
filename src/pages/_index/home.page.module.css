@@ -3,8 +3,8 @@
 	grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
 	gap: clamp(3rem, 8vw, 7rem);
 	align-items: center;
-	min-height: min(720px, calc(100vh - 68px));
-	padding: clamp(5rem, 10vw, 8rem) 0;
+	min-height: min(720px, calc(100svh - 68px));
+	padding: clamp(4rem, 9vh, 8rem) 0;
 }
 
 .heroCopy {
@@ -40,7 +40,7 @@
 	max-width: 780px;
 	margin-top: 1.5rem;
 	color: var(--color-text);
-	font-size: clamp(3.3rem, 7vw, 6.4rem);
+	font-size: clamp(3.3rem, min(7vw, 11vh), 6.4rem);
 	font-weight: 620;
 	letter-spacing: -0.07em;
 	line-height: 0.94;
@@ -319,6 +319,7 @@
 	color: var(--color-text);
 	font-family: var(--font-mono);
 	font-size: 0.85rem;
+	line-height: 1.8;
 	transition: 360ms var(--motion-ease);
 	transition-property: border-color, box-shadow, transform;
 }
@@ -424,16 +425,19 @@
 	}
 }
 
-@media (width <= 62rem) {
+@media (width <= 70rem) {
 	.homeHero {
 		grid-template-columns: 1fr;
 		min-height: auto;
 	}
 
 	.quickStart {
+		width: 100%;
 		max-width: 620px;
 	}
+}
 
+@media (width <= 62rem) {
 	.stackStrip {
 		grid-template-columns: repeat(3, 1fr);
 	}

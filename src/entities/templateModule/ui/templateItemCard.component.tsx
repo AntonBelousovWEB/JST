@@ -38,7 +38,7 @@ export const TemplateItemCard = reatomComponent(
 					variant={isSelected ? 'filled' : 'subtle'}
 					onClick={wrap(() => onToggleSelected(item.id))}
 				>
-					{isSelected ? 'Selected' : 'Select example'}
+					{isSelected ? 'Selected' : 'Select block'}
 				</Button>
 			</Card>
 		)

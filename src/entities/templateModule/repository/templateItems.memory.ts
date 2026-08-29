@@ -4,35 +4,35 @@ import type { TemplateItemDTO } from '@/shared/dto/templateItemDto.types'
 const TEMPLATE_ITEMS: TemplateItemDTO[] = [
 	{
 		id: 1,
-		title: 'SSR document shell',
+		title: 'SSR before hydration',
 		description:
-			'React Router owns requests, status codes, server rendering, hydration, and route errors.',
-		area: 'app',
+			'React Router owns requests, status codes, server rendering, hydration, and route errors—without a custom server.',
+		area: 'runtime',
 		badge: 'SSR',
 	},
 	{
 		id: 2,
-		title: 'Dependency rules',
+		title: 'Boundaries enforced in CI',
 		description:
-			'ESLint rejects imports that point against the app, page, feature, entity, and shared layers.',
+			'ESLint rejects imports that cross the app, page, feature, entity, and shared layers in the wrong direction.',
 		area: 'architecture',
-		badge: 'Lint',
+		badge: 'Enforced',
 	},
 	{
 		id: 3,
-		title: 'Replaceable boundaries',
+		title: 'Effects stay replaceable',
 		description:
-			'Repositories and effectful adapters are selected through a request-scoped Needle DI container.',
-		area: 'entities',
-		badge: 'Domain',
+			'HTTP and storage sit behind narrow contracts and request-scoped DI instead of leaking into React components.',
+		area: 'domain',
+		badge: 'DI',
 	},
 	{
 		id: 4,
-		title: 'Delivery baseline',
+		title: 'A demo designed to disappear',
 		description:
-			'TypeScript, Vitest, production builds, Knip, Playwright, Axe, and CI are ready to run.',
-		area: 'tooling',
-		badge: 'CI',
+			'The setup CLI removes the reference features while preserving the production baseline and its checks.',
+		area: 'setup',
+		badge: 'Reset',
 	},
 ]
 

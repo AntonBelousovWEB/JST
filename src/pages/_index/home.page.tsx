@@ -16,15 +16,22 @@ const getClientSnapshot = () => true
 const getServerSnapshot = () => false
 
 const requestPath = [
-	['01', 'Page', 'compose dependencies'],
-	['02', 'Feature', 'own the user flow'],
-	['03', 'Store', 'loading, errors, actions'],
-	['04', 'Service', 'run the use case'],
-	['05', 'Repository', 'declare the endpoint'],
-	['06', 'HttpClient', 'execute the request'],
+	['01', 'Page', 'compose the use case'],
+	['02', 'Feature', 'own the interaction'],
+	['03', 'View model', 'expose async state'],
+	['04', 'Service', 'map DTOs to domain'],
+	['05', 'Repository', 'own the API contract'],
+	['06', 'HttpClient', 'handle transport'],
 ]
 
-const stack = ['React 19', 'React Router', 'TypeScript', 'Reatom', 'Needle DI', 'Mantine']
+const engineeringDefaults = [
+	'SSR by default',
+	'File-based routes',
+	'Typed data flow',
+	'Request-scoped DI',
+	'Scoped styles',
+	'CI-ready checks',
+]
 
 function useScrollReveal() {
 	const rootRef = useRef<HTMLDivElement>(null)
@@ -71,18 +78,18 @@ export const HomePage = reatomComponent(() => {
 		<Stack ref={pageRef} className={styles.page} gap={0}>
 			<section className={styles.homeHero} aria-labelledby="home-title">
 				<div className={styles.heroCopy}>
-					<Text className={styles.kicker}>React 19 / SSR / TypeScript</Text>
+					<Text className={styles.kicker}>React 19 / SSR / resettable</Text>
 					<Title order={1} id="home-title" className={styles.heroTitle}>
-						A React starter without the starter debt.
+						Keep the architecture. Delete the demo.
 					</Title>
 					<Text className={styles.heroLead}>
-						Routing, DI, view models, tests, and CI are already wired as a removable
-						reference app—not a framework you have to fight.
+						Start with working SSR, enforceable layer boundaries, DI, typed data flow,
+						and production checks. Study the reference app, then remove it cleanly.
 					</Text>
 					<Group mt="xl" gap="sm">
-						<Button component="a" href="#quick-start" size="md">Start a project</Button>
-						<Button component="a" href="#request-flow" variant="default" size="md">
-							See the request pipeline
+						<Button component="a" href="#request-flow" size="md">Trace a real request</Button>
+						<Button component="a" href="#playground" variant="default" size="md">
+							Test the state flow
 						</Button>
 					</Group>
 				</div>
@@ -116,19 +123,19 @@ export const HomePage = reatomComponent(() => {
 				</aside>
 			</section>
 
-			<div className={styles.stackStrip} data-reveal="up" aria-label="Included technologies">
-				{stack.map(item => <span key={item}>{item}</span>)}
+			<div className={styles.stackStrip} data-reveal="up" aria-label="Engineering defaults">
+				{engineeringDefaults.map(item => <span key={item}>{item}</span>)}
 			</div>
 
 			<section id="request-flow" className={styles.section} aria-labelledby="request-flow-title">
 				<div className={styles.sectionHeading} data-reveal="up">
 					<div>
-						<Text className={styles.kicker}>Working code, not a diagram</Text>
-						<Title order={2} id="request-flow-title">Follow one request through every boundary.</Title>
+						<Text className={styles.kicker}>Proof, not promises</Text>
+						<Title order={2} id="request-flow-title">One live request. Every boundary visible.</Title>
 					</div>
 					<Text>
-						The demo calls JSONPlaceholder. Transport data stays below the service;
-						the UI receives a domain model and explicit async state.
+						A JSONPlaceholder response crosses the HTTP client, repository, service,
+						and Reatom view model before React sees it. Each boundary has one job.
 					</Text>
 				</div>
 
@@ -147,7 +154,7 @@ export const HomePage = reatomComponent(() => {
 
 					<div className={styles.requestPreview} data-reveal="right">
 						<div className={styles.requestPreviewBar}>
-							<span>live response</span>
+							<span>live API response</span>
 							<Badge className={styles.requestBadge} variant="light">JSONPlaceholder</Badge>
 						</div>
 						{hydrated
@@ -168,22 +175,22 @@ export const HomePage = reatomComponent(() => {
 			<section id="playground" className={styles.section} aria-labelledby="playground-title">
 				<div className={styles.sectionHeading} data-reveal="up">
 					<div>
-						<Text className={styles.kicker}>Small state playground</Text>
-						<Title order={2} id="playground-title">Search it. Select it. Reload it.</Title>
+						<Text className={styles.kicker}>A second proof</Text>
+						<Title order={2} id="playground-title">Same rules. Different side effect.</Title>
 					</div>
 					<Text>
-						A second, local-only slice shows the same boundaries with persistence
-						instead of HTTP. The setup CLI can remove both demos.
+						Search, selection, and persistence follow the same ownership rules against
+						local storage. The examples are disposable. The boundaries are not.
 					</Text>
 				</div>
 
 				<div className={styles.selectionPanel} data-reveal="up">
 					<div>
-						<span>selected</span>
+						<span>persisted selection</span>
 						<strong>
 							{selectedItems.length
 								? selectedItems.map(item => item.title).join(' / ')
-								: 'Nothing selected yet.'}
+								: 'No blocks selected yet.'}
 						</strong>
 					</div>
 					<Button
@@ -212,20 +219,25 @@ export const HomePage = reatomComponent(() => {
 
 			<section className={styles.deliveryStrip} aria-labelledby="delivery-title">
 				<div data-reveal="left">
-					<Text className={styles.kicker}>Before every pull request</Text>
-					<Title order={2} id="delivery-title">One command. The whole baseline.</Title>
+					<Text className={styles.kicker}>The delivery contract</Text>
+					<Title order={2} id="delivery-title">Prove it before review.</Title>
 				</div>
 				<code data-reveal="right">
 					<span>$</span>
 					{' '}
 					npm run check
+					<br />
+					<span>$</span>
+					{' '}
+					npm run test:e2e
 				</code>
 				<ul data-reveal="up" aria-label="Quality gates">
-					<li>ESLint</li>
+					<li>ESLint + Stylelint</li>
 					<li>Vitest</li>
 					<li>TypeScript</li>
-					<li>Build</li>
+					<li>SSR build</li>
 					<li>Knip</li>
+					<li>Playwright + Axe</li>
 				</ul>
 			</section>
 		</Stack>

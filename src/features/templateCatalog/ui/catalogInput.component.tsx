@@ -12,8 +12,8 @@ export const CatalogInput = reatomComponent(() => {
 	return (
 		<TextInput
 			classNames={{ input: styles.input, label: styles.label }}
-			label="Filter the reference app"
-			placeholder="Search SSR, lint, DI, CI..."
+			label="Explore the engineering defaults"
+			placeholder="Search SSR, boundaries, DI, reset..."
 			value={search()}
 			onChange={wrap(event => search.set(event.target.value))}
 		/>
