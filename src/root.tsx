@@ -14,6 +14,7 @@ import { AppProviders } from './app/app.component'
 import { BaseLayout } from './app/baseLayout.component'
 import { createAppContainer } from './app/container/container'
 import { appColorScheme, forcedColorScheme } from './app/theme'
+import styles from './root.module.css'
 import { APP_CONFIG } from './shared/config'
 import '@mantine/core/styles.css'
 import './index.css'
@@ -26,7 +27,7 @@ export const headers: Route.HeadersFunction = () => ({
 
 export function Layout({ children }: { children: ReactNode }) {
 	return (
-		<html lang={APP_CONFIG.language}>
+		<html lang={APP_CONFIG.language} suppressHydrationWarning>
 			<head>
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -42,7 +43,7 @@ export function Layout({ children }: { children: ReactNode }) {
 				{/* SVG content is compiled from repository-owned files during the Vite build. */}
 				{/* eslint-disable-next-line react/dom-no-dangerously-set-innerhtml */}
 				<div aria-hidden="true" dangerouslySetInnerHTML={{ __html: svgSprite }} />
-				<a className="skip-link" href="#main-content">Skip to content</a>
+				<a className={styles.skipLink} href="#main-content">Skip to content</a>
 				{children}
 				<ScrollRestoration />
 				<Scripts />

@@ -12,8 +12,10 @@
 		"typecheck": "react-router typegen && tsc -b --pretty false",
 		"build": "npm run typecheck && react-router build",
 		"start": "react-router-serve ./build/server/index.js",
-		"lint": "eslint . --cache --max-warnings 0",
-		"lint:fix": "eslint . --cache --fix",
+		"lint": "eslint . --cache --max-warnings 0 && npm run lint:styles",
+		"lint:fix": "eslint . --cache --fix && npm run lint:styles:fix",
+		"lint:styles": "node scripts/check-style-files.mjs && stylelint \"src/**/*.css\"",
+		"lint:styles:fix": "stylelint \"src/**/*.css\" --fix && node scripts/check-style-files.mjs",
 		"knip": "knip",
 		"test": "vitest",
 		"test:unit": "vitest run --passWithNoTests",
@@ -54,6 +56,8 @@
 		"husky": "^9.1.7",
 		"knip": "^6.32.3",
 		"lint-staged": "^17.4.1",
+		"stylelint": "^17.14.1",
+		"stylelint-config-standard": "^40.0.0",
 		"typescript": "~5.9.3",
 		"vite": "^8.2.2",
 		"vite-plugin-svg-icons-ng": "^1.9.3",
@@ -67,7 +71,11 @@
 			"eslint --cache --fix",
 			"vitest related --run"
 		],
-		"*.{json,css,scss,html}": [
+		"*.{css,scss}": [
+			"stylelint --fix",
+			"node scripts/check-style-files.mjs"
+		],
+		"*.{json,html}": [
 			"eslint --fix"
 		]
 	}

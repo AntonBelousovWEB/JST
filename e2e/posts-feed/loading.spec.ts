@@ -15,6 +15,12 @@ test('renders the JSONPlaceholder response through the posts feature', async ({ 
 	await expect(page.getByRole('heading', { name: 'First typed response' })).toBeVisible()
 	await expect(page.getByText('Mapped from a transport DTO.')).toBeVisible()
 	await expect(page.getByText('User 1')).toHaveCount(3)
+
+	const refreshButton = page.getByRole('button', { name: 'Refresh response' })
+	await refreshButton.click()
+	await expect(page.getByText('syncing')).toBeVisible()
+	await expect(page.getByRole('button', { name: 'Refreshing response' })).toBeDisabled()
+	await expect(refreshButton).toBeEnabled()
 })
 
 test('exposes a recoverable API error state', async ({ page }) => {

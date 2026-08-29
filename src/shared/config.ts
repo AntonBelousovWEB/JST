@@ -3,5 +3,5 @@ export const APP_CONFIG = {
 	description: 'Production-ready React starter with SSR, DI, layered architecture, tests, and Mantine UI.',
 	language: 'en',
 	name: 'Frontend Starter',
-	primaryColor: 'violet',
+	primaryColor: 'lime',
 } as const

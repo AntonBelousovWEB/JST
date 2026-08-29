@@ -15,7 +15,7 @@ It uses React Router Framework Mode for SSR instead of a hand-written server. Th
 - Needle DI with one container per rendered application
 - Shared HTTP client over native Fetch with explicit repository boundaries
 - Vitest and Playwright
-- ESLint architecture rules, Knip, lint-staged, Husky, and GitHub Actions
+- ESLint architecture rules, Stylelint, Knip, lint-staged, Husky, and GitHub Actions
 
 ## Quick start
 
@@ -111,6 +111,26 @@ Decorative icons are hidden from assistive technology; providing `aria-label` gi
 
 The example uses the stable Reatom packages. Stores stay in the owning entity and expose state and operations to features; React components subscribe through `reatomComponent`.
 
+### Styling
+
+Component and route styles use colocated CSS Modules whose basename matches their owner:
+
+```text
+PostCard.tsx
+PostCard.module.css
+
+home.page.tsx
+home.page.module.css
+```
+
+Import the module as `styles` and use camelCase local names (`styles.requestStatus`). A stylesheet may style only its owner's markup; do not import another feature's or entity's private module. Pass module classes through Mantine's `className`/`classNames` APIs when styling component slots.
+
+[`src/index.css`](src/index.css) is the sole application-global stylesheet. Keep only design tokens, reset/base rules, accessibility defaults, and intentional third-party integration overrides there. Shared visual values belong in CSS custom properties; component-specific values stay local until another real consumer exists.
+
+Plain CSS is the default because Vite supports CSS Modules directly and modern CSS already provides variables, nesting-compatible selectors, container queries, and color functions. Do not install Sass pre-emptively. If a product genuinely needs Sass, adopt `.module.scss` consistently and extend the style toolchain in the same change instead of mixing unlinted formats.
+
+`npm run lint:styles` enforces CSS quality, camelCase module classes, the `.module.css` suffix, colocation, and owner/file basename matching. The same gate runs in CI and pre-commit checks.
+
 ### Remote data flow
 
 The posts example deliberately keeps the network slice concrete and removable:
@@ -143,6 +163,7 @@ The shared HTTP client owns URL construction, query serialization, headers, JSON
 | `npm run test:e2e` | Build and run Playwright SSR/hydration tests |
 | `npm run lint` | Run cached, type-aware ESLint with zero warnings |
 | `npm run lint:fix` | Apply safe ESLint fixes |
+| `npm run lint:styles` | Enforce Stylelint and the colocated CSS Module contract |
 | `npm run knip` | Find unused files, exports, and dependencies |
 | `npm run check` | Run the local CI quality gate |
 | `npm run template:setup` | Configure the product interactively or through flags |
@@ -152,6 +173,7 @@ The shared HTTP client owns URL construction, query serialization, headers, JSON
 - Vitest collects colocated application tests and tooling tests under `scripts/**/__tests__`.
 - Playwright verifies usable server-rendered HTML with JavaScript disabled, a stable initial color scheme, route errors, clean hydration, the live API success/error flow, keyboard bypass navigation, and automated accessibility checks with Axe.
 - Knip keeps dead files, exports, and dependencies out of the template.
+- Stylelint and the file-contract check reject invalid CSS and unscoped local styles.
 - Pre-commit checks operate only on staged files; the full gate runs in CI.
 - GitHub Actions runs lint, unit tests, type checking, the production build, and Chromium E2E tests.
 - Dependabot proposes weekly npm and GitHub Actions updates.

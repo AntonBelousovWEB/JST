@@ -1,7 +1,7 @@
-import { Badge, Box, Button, Card, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core'
+import { Badge, Box, Button, Group, Loader, Stack, Text, Title } from '@mantine/core'
 import { wrap } from '@reatom/core'
 import { reatomComponent } from '@reatom/react'
-import { useSyncExternalStore } from 'react'
+import { useEffect, useRef, useSyncExternalStore } from 'react'
 import { useService } from '@/app/container/container.context'
 import { PostsStore } from '@/entities/post/posts.store'
 import { TemplateModuleStore } from '@/entities/templateModule/templateModule.store'
@@ -9,129 +9,193 @@ import { PostsFeedEntry } from '@/features/postsFeed/postsFeed.entry'
 import { PostsFeedInjector } from '@/features/postsFeed/postsFeed.injector'
 import { TemplateCatalogEntry } from '@/features/templateCatalog/templateCatalog.entry'
 import { TemplateCatalogInjector } from '@/features/templateCatalog/templateCatalog.injector'
-import './home.css'
+import styles from './home.page.module.css'
 
 const subscribe = () => () => {}
 const getClientSnapshot = () => true
 const getServerSnapshot = () => false
 
-const architectureLayers = [
-	{ number: '01', name: 'Page', detail: 'Composes a route and resolves dependencies.' },
-	{ number: '02', name: 'Feature', detail: 'Owns one user-facing workflow.' },
-	{ number: '03', name: 'Entity', detail: 'Keeps models, services, and view-model state together.' },
-	{ number: '04', name: 'Repository', detail: 'Isolates HTTP and persistence contracts.' },
+const requestPath = [
+	['01', 'Page', 'compose dependencies'],
+	['02', 'Feature', 'own the user flow'],
+	['03', 'Store', 'loading, errors, actions'],
+	['04', 'Service', 'run the use case'],
+	['05', 'Repository', 'declare the endpoint'],
+	['06', 'HttpClient', 'execute the request'],
 ]
 
-const qualitySignals = [
-	['Server rendering', 'React Router owns the request, document, and hydration lifecycle.'],
-	['Replaceable boundaries', 'Needle DI swaps effectful adapters without service locators.'],
-	['Enforced direction', 'ESLint checks imports across app, pages, features, entities, and shared.'],
-	['Real delivery gates', 'TypeScript, Vitest, Playwright, Axe, Knip, and CI ship configured.'],
-]
+const stack = ['React 19', 'React Router', 'TypeScript', 'Reatom', 'Needle DI', 'Mantine']
+
+function useScrollReveal() {
+	const rootRef = useRef<HTMLDivElement>(null)
+
+	useEffect(() => {
+		const root = rootRef.current
+		if (!root) {
+			return
+		}
+
+		const elements = root.querySelectorAll<HTMLElement>('[data-reveal], [data-reveal-group]')
+		if (
+			window.matchMedia('(prefers-reduced-motion: reduce)').matches
+			|| !('IntersectionObserver' in window)
+		) {
+			return
+		}
+
+		root.dataset.motion = 'ready'
+		const observer = new IntersectionObserver((entries) => {
+			for (const entry of entries) {
+				if (entry.isIntersecting) {
+					(entry.target as HTMLElement).dataset.visible = 'true'
+					observer.unobserve(entry.target)
+				}
+			}
+		}, { rootMargin: '0px 0px -10% 0px', threshold: 0.12 })
+
+		elements.forEach(element => observer.observe(element))
+		return () => observer.disconnect()
+	}, [])
+
+	return rootRef
+}
 
 export const HomePage = reatomComponent(() => {
+	const pageRef = useScrollReveal()
 	const templateModuleStore = useService(TemplateModuleStore)
 	const postsStore = useService(PostsStore)
 	const hydrated = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot)
 	const selectedItems = hydrated ? templateModuleStore.selectedItems() : []
 
 	return (
-		<Stack gap={0}>
-			<section className="home-hero" aria-labelledby="home-title">
-				<div className="home-hero__eyebrow">
-					<span aria-hidden="true" />
-					Production-oriented React foundation
+		<Stack ref={pageRef} className={styles.page} gap={0}>
+			<section className={styles.homeHero} aria-labelledby="home-title">
+				<div className={styles.heroCopy}>
+					<Text className={styles.kicker}>React 19 / SSR / TypeScript</Text>
+					<Title order={1} id="home-title" className={styles.heroTitle}>
+						A React starter without the starter debt.
+					</Title>
+					<Text className={styles.heroLead}>
+						Routing, DI, view models, tests, and CI are already wired as a removable
+						reference app—not a framework you have to fight.
+					</Text>
+					<Group mt="xl" gap="sm">
+						<Button component="a" href="#quick-start" size="md">Start a project</Button>
+						<Button component="a" href="#request-flow" variant="default" size="md">
+							See the request pipeline
+						</Button>
+					</Group>
 				</div>
-				<Title order={1} id="home-title" className="home-hero__title">
-					Ship the product.
-					<br />
-					<span>Keep the architecture.</span>
-				</Title>
-				<Text className="home-hero__copy">
-					A removable reference application for teams that want SSR, explicit
-					boundaries, typed data flow, and serious quality gates without a private
-					framework.
-				</Text>
-				<Group mt="xl" gap="sm">
-					<Button component="a" href="#live-api" size="md">Inspect the live API flow</Button>
-					<Button component="a" href="#architecture" variant="default" size="md">
-						View the system map
-					</Button>
-				</Group>
 
-				<div className="home-hero__facts" aria-label="Starter capabilities">
-					<div>
-						<strong>React 19</strong>
-						<span>stable runtime</span>
+				<aside id="quick-start" className={styles.quickStart} aria-label="Quick start commands">
+					<div className={styles.quickStartBar}>
+						<span>quick-start</span>
+						<span>zsh</span>
 					</div>
-					<div>
-						<strong>SSR</strong>
-						<span>framework-owned</span>
+					<div className={styles.quickStartBody}>
+						<p>
+							<span>$</span>
+							{' '}
+							npm ci
+						</p>
+						<p>
+							<span>$</span>
+							{' '}
+							npm run template:setup
+						</p>
+						<p>
+							<span>$</span>
+							{' '}
+							npm run dev
+						</p>
+						<div className={styles.quickStartResult}>
+							<span>ready</span>
+							<strong>localhost:5173</strong>
+						</div>
 					</div>
-					<div>
-						<strong>6 layers</strong>
-						<span>lint-enforced</span>
-					</div>
-					<div>
-						<strong>4 gates</strong>
-						<span>before merge</span>
-					</div>
-				</div>
+				</aside>
 			</section>
 
-			<section id="architecture" className="home-section" aria-labelledby="architecture-title">
-				<div className="home-section__heading">
+			<div className={styles.stackStrip} data-reveal="up" aria-label="Included technologies">
+				{stack.map(item => <span key={item}>{item}</span>)}
+			</div>
+
+			<section id="request-flow" className={styles.section} aria-labelledby="request-flow-title">
+				<div className={styles.sectionHeading} data-reveal="up">
 					<div>
-						<Text className="home-kicker">System map</Text>
-						<Title order={2} id="architecture-title">Clear ownership from screen to network.</Title>
+						<Text className={styles.kicker}>Working code, not a diagram</Text>
+						<Title order={2} id="request-flow-title">Follow one request through every boundary.</Title>
 					</div>
 					<Text>
-						Each layer does one job. Dependencies move downward; effectful adapters
-						are selected once at the composition root.
+						The demo calls JSONPlaceholder. Transport data stays below the service;
+						the UI receives a domain model and explicit async state.
 					</Text>
 				</div>
 
-				<div className="architecture-flow">
-					{architectureLayers.map(layer => (
-						<article key={layer.name}>
-							<Text ff="monospace" className="architecture-flow__number">{layer.number}</Text>
-							<Title order={3}>{layer.name}</Title>
-							<Text>{layer.detail}</Text>
-						</article>
-					))}
+				<div className={styles.requestLab}>
+					<ol className={styles.requestPath} data-reveal-group="left" aria-label="Request architecture">
+						{requestPath.map(([number, name, detail]) => (
+							<li key={name}>
+								<span>{number}</span>
+								<div>
+									<strong>{name}</strong>
+									<small>{detail}</small>
+								</div>
+							</li>
+						))}
+					</ol>
+
+					<div className={styles.requestPreview} data-reveal="right">
+						<div className={styles.requestPreviewBar}>
+							<span>live response</span>
+							<Badge className={styles.requestBadge} variant="light">JSONPlaceholder</Badge>
+						</div>
+						{hydrated
+							? (
+									<PostsFeedInjector value={{ postsStore }}>
+										<PostsFeedEntry />
+									</PostsFeedInjector>
+								)
+							: (
+									<Box className={styles.apiLoading} role="status" aria-label="Loading posts">
+										<Loader aria-hidden="true" size="sm" />
+									</Box>
+								)}
+					</div>
 				</div>
 			</section>
 
-			<section className="home-section" aria-labelledby="catalog-title">
-				<div className="home-section__heading">
+			<section id="playground" className={styles.section} aria-labelledby="playground-title">
+				<div className={styles.sectionHeading} data-reveal="up">
 					<div>
-						<Text className="home-kicker">Interactive reference</Text>
-						<Title order={2} id="catalog-title">Explore what ships in the starter.</Title>
+						<Text className={styles.kicker}>Small state playground</Text>
+						<Title order={2} id="playground-title">Search it. Select it. Reload it.</Title>
 					</div>
-					<Text>Search and persist a selection to see state, service, repository, and storage boundaries working together.</Text>
+					<Text>
+						A second, local-only slice shows the same boundaries with persistence
+						instead of HTTP. The setup CLI can remove both demos.
+					</Text>
 				</div>
 
-				<Card className="selection-panel" padding="lg" radius="md">
-					<Group justify="space-between" align="center" wrap="nowrap">
-						<Stack gap={3}>
-							<Text size="xs" ff="monospace" className="selection-panel__label">SELECTED MODULES</Text>
-							<Text size="sm" c="var(--color-text-muted)">
-								{selectedItems.length
-									? selectedItems.map(item => item.title).join(' · ')
-									: 'Nothing selected yet. Selection is persisted through shared storage.'}
-							</Text>
-						</Stack>
-						<Button
-							variant="subtle"
-							disabled={!selectedItems.length}
-							onClick={wrap(templateModuleStore.clearSelected)}
-						>
-							Clear
-						</Button>
-					</Group>
-				</Card>
+				<div className={styles.selectionPanel} data-reveal="up">
+					<div>
+						<span>selected</span>
+						<strong>
+							{selectedItems.length
+								? selectedItems.map(item => item.title).join(' / ')
+								: 'Nothing selected yet.'}
+						</strong>
+					</div>
+					<Button
+						variant="subtle"
+						disabled={!selectedItems.length}
+						onClick={wrap(templateModuleStore.clearSelected)}
+					>
+						Clear
+					</Button>
+				</div>
 
-				<Box mt="lg">
+				<Box mt="lg" data-reveal="up">
 					{hydrated
 						? (
 								<TemplateCatalogInjector value={{ templateModuleStore }}>
@@ -146,47 +210,23 @@ export const HomePage = reatomComponent(() => {
 				</Box>
 			</section>
 
-			<section id="live-api" className="home-section" aria-labelledby="api-title">
-				<div className="home-section__heading">
-					<div>
-						<Group gap="xs">
-							<Text className="home-kicker">Live boundary</Text>
-							<Badge variant="light">JSONPlaceholder</Badge>
-						</Group>
-						<Title order={2} id="api-title">A real request, without leaking transport into UI.</Title>
-					</div>
-					<Text>The repository owns the endpoint contract, the service maps DTOs, and the view model owns loading, errors, and retry.</Text>
+			<section className={styles.deliveryStrip} aria-labelledby="delivery-title">
+				<div data-reveal="left">
+					<Text className={styles.kicker}>Before every pull request</Text>
+					<Title order={2} id="delivery-title">One command. The whole baseline.</Title>
 				</div>
-
-				{hydrated
-					? (
-							<PostsFeedInjector value={{ postsStore }}>
-								<PostsFeedEntry />
-							</PostsFeedInjector>
-						)
-					: (
-							<Box role="status" aria-label="Loading posts">
-								<Loader aria-hidden="true" size="sm" />
-							</Box>
-						)}
-			</section>
-
-			<section className="home-section home-section--last" aria-labelledby="quality-title">
-				<div className="home-section__heading">
-					<div>
-						<Text className="home-kicker">Engineering baseline</Text>
-						<Title order={2} id="quality-title">Boring where reliability matters.</Title>
-					</div>
-					<Text>The starter chooses explicit conventions over clever infrastructure. Remove the demo; keep the gates.</Text>
-				</div>
-				<SimpleGrid cols={{ base: 1, sm: 2 }} spacing={0} className="quality-grid">
-					{qualitySignals.map(([title, detail]) => (
-						<div key={title}>
-							<Title order={3}>{title}</Title>
-							<Text>{detail}</Text>
-						</div>
-					))}
-				</SimpleGrid>
+				<code data-reveal="right">
+					<span>$</span>
+					{' '}
+					npm run check
+				</code>
+				<ul data-reveal="up" aria-label="Quality gates">
+					<li>ESLint</li>
+					<li>Vitest</li>
+					<li>TypeScript</li>
+					<li>Build</li>
+					<li>Knip</li>
+				</ul>
 			</section>
 		</Stack>
 	)

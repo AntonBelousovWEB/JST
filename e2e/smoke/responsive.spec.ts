@@ -9,7 +9,7 @@ test('home page fits a small viewport without horizontal overflow', async ({ pag
 	await page.goto('/')
 
 	await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-	await expect(page.getByRole('link', { name: 'Inspect the live API flow' })).toBeVisible()
+	await expect(page.getByRole('link', { name: 'See the request pipeline' })).toBeVisible()
 
 	const viewport = page.viewportSize()
 	const main = await page.getByRole('main').boundingBox()

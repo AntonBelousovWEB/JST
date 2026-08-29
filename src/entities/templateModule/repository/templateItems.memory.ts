@@ -4,35 +4,35 @@ import type { TemplateItemDTO } from '@/shared/dto/templateItemDto.types'
 const TEMPLATE_ITEMS: TemplateItemDTO[] = [
 	{
 		id: 1,
-		title: 'SSR-ready app shell',
+		title: 'SSR document shell',
 		description:
-			'Request-scoped DI container, server render entry, hydration entry, and shared route config.',
+			'React Router owns requests, status codes, server rendering, hydration, and route errors.',
 		area: 'app',
 		badge: 'SSR',
 	},
 	{
 		id: 2,
-		title: 'Feature-first example',
+		title: 'Dependency rules',
 		description:
-			'A removable catalog feature that shows how pages compose stores, entities, and UI kit components.',
-		area: 'features',
-		badge: 'Feature',
+			'ESLint rejects imports that point against the app, page, feature, entity, and shared layers.',
+		area: 'architecture',
+		badge: 'Lint',
 	},
 	{
 		id: 3,
-		title: 'Entity boundary',
+		title: 'Replaceable boundaries',
 		description:
-			'Repository, service, model, builder, store, and presentational components are isolated by responsibility.',
+			'Repositories and effectful adapters are selected through a request-scoped Needle DI container.',
 		area: 'entities',
 		badge: 'Domain',
 	},
 	{
 		id: 4,
-		title: 'Shared infrastructure',
+		title: 'Delivery baseline',
 		description:
-			'Storage adapters, route metadata, and focused helpers live in shared without becoming a custom framework.',
-		area: 'shared',
-		badge: 'Infra',
+			'TypeScript, Vitest, production builds, Knip, Playwright, Axe, and CI are ready to run.',
+		area: 'tooling',
+		badge: 'CI',
 	},
 ]
 

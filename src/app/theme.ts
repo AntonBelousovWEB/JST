@@ -7,12 +7,14 @@ export const forcedColorScheme = getForcedColorScheme(appColorScheme)
 
 export const theme = createTheme({
 	autoContrast: true,
+	defaultRadius: 'xs',
 	fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 	headings: {
 		fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 		fontWeight: '600',
 	},
 	primaryColor: APP_CONFIG.primaryColor,
+	primaryShade: { dark: 4, light: 7 },
 })
 
 function getForcedColorScheme(colorScheme: MantineColorScheme) {

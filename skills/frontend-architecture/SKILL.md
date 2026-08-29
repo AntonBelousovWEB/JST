@@ -23,6 +23,15 @@ Passing an upper-layer dependency into a lower layer still creates upward coupli
 
 Strict FSD cross-slice isolation is optional when it adds indirection without reducing coupling. A direct same-layer import is acceptable while ownership is clear, there is no cycle, and the code has one consumer. Extract a feature/shared contract when reuse, independent change, or test substitution becomes real.
 
+## Styling
+
+- Colocate `Owner.tsx` with `Owner.module.css`; the basename must match. Use plain CSS unless the project deliberately adopts and lints Sass.
+- Import modules as `styles`; use camelCase local classes. Pass them through UI-library `className`/`classNames` slots.
+- A module styles only markup owned by that file. Never import another slice's private stylesheet or target its generated class names.
+- Keep only tokens, reset/base accessibility rules, and deliberate third-party overrides in `src/index.css`.
+- Prefer existing CSS custom properties and native CSS. Promote a token or utility only after a second real consumer.
+- Run `npm run lint:styles`; do not bypass the naming or Stylelint checks.
+
 ## Delivery check
 
 Keep transport failure and empty/loading states explicit. Test domain mapping with a substituted repository and test the user flow with role-based Playwright locators. Run `npm run check`; add abstractions only when the current slice proves they are needed.

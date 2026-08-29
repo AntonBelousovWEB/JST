@@ -30,7 +30,7 @@ const demoPaths = [
 	'src/entities/templateModule',
 	'src/features/postsFeed',
 	'src/features/templateCatalog',
-	'src/pages/_index/home.css',
+	'src/pages/_index/home.page.module.css',
 	'src/pages/_index/home.page.tsx',
 	'src/shared/api',
 	'src/shared/dto/postDto.types.ts',
@@ -89,7 +89,7 @@ async function resolveOptions(values) {
 			description: values.description ?? `${title} web application.`,
 			language: values.lang ?? 'en',
 			name,
-			primaryColor: values['primary-color'] ?? 'violet',
+			primaryColor: values['primary-color'] ?? 'lime',
 			title,
 		}
 	}
@@ -106,7 +106,7 @@ async function resolveOptions(values) {
 			description: values.description ?? await ask(prompts, 'SEO description', `${title} web application.`),
 			language: values.lang ?? await ask(prompts, 'Document language', 'en'),
 			name,
-			primaryColor: values['primary-color'] ?? await ask(prompts, `Mantine primary color (${primaryColors.join('/')})`, 'violet'),
+			primaryColor: values['primary-color'] ?? await ask(prompts, `Mantine primary color (${primaryColors.join('/')})`, 'lime'),
 			title,
 		}
 	}

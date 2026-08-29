@@ -4,6 +4,7 @@
 
 1. Create a focused branch from `main`.
 2. Keep changes inside the existing layer boundaries; `npm run lint` checks alias and relative imports.
+   Colocate UI styles as matching `*.module.css` files; the same command runs Stylelint and the style-file contract.
 3. Add the smallest test that would fail without the change.
 4. Run the same gates as CI:
 

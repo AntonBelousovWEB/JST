@@ -3,15 +3,16 @@ import { Anchor, Box, Container, Group, Text } from '@mantine/core'
 import { Link, NavLink } from 'react-router'
 import { APP_CONFIG } from '@/shared/config'
 import { SvgIcon } from '@/shared/ui/SvgIcon'
+import styles from './NavBar.module.css'
 
 export function NavBar({ items }: { items: NavigationItem[] }) {
 	return (
-		<Box component="header" className="app-header">
+		<Box component="header" className={styles.header}>
 			<Container size="lg">
 				<Group h={68} justify="space-between">
-					<Anchor component={Link} to="/" underline="never">
+					<Anchor className={styles.brand} component={Link} to="/" underline="never">
 						<Group component="span" gap="sm" wrap="nowrap">
-							<span className="app-header__mark">
+							<span className={styles.mark}>
 								<SvgIcon name="app" width={18} height={18} />
 							</span>
 							<Text fw={650} c="var(--color-text)" size="sm">{APP_CONFIG.name}</Text>
@@ -26,7 +27,7 @@ export function NavBar({ items }: { items: NavigationItem[] }) {
 								to={item.path}
 								end={item.path === '/'}
 								underline="never"
-								className="app-header__link"
+								className={styles.link}
 							>
 								{item.label}
 							</Anchor>

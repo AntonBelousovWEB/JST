@@ -1,17 +1,21 @@
 :root {
 	color-scheme: dark;
-	--color-bg: #0f0f10;
-	--color-bg-subtle: #131315;
-	--color-surface: #171719;
-	--color-surface-hover: #1d1d20;
-	--color-border: #2a2a2e;
-	--color-border-strong: #3b3b42;
-	--color-text: #f4f5f8;
-	--color-text-muted: #9b9ca5;
-	--color-text-faint: #898a93;
-	--color-accent: #8b83ff;
-	--color-accent-muted: rgba(139, 131, 255, 0.14);
-	--color-success: #58c99a;
+
+	--color-bg: #090a08;
+	--color-bg-subtle: #0d0f0c;
+	--color-surface: #11130f;
+	--color-surface-hover: #171a14;
+	--color-border: #292d24;
+	--color-border-strong: #464c3b;
+	--color-text: #f1f3e9;
+	--color-text-muted: #a5aa9c;
+	--color-text-faint: #858a7e;
+	--color-accent: #c8f169;
+	--color-accent-muted: rgb(200 241 105 / 12%);
+	--color-success: #8fd8a1;
+	--font-mono: 'SFMono-Regular', consolas, 'Liberation Mono', monospace;
+	--motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
 	background: var(--color-bg);
 	font-synthesis: none;
 	text-rendering: optimizelegibility;
@@ -21,18 +25,19 @@
 
 :root[data-mantine-color-scheme='light'] {
 	color-scheme: light;
-	--color-bg: #f7f7f8;
-	--color-bg-subtle: #f0f0f2;
+
+	--color-bg: #f4f5ef;
+	--color-bg-subtle: #eceee5;
 	--color-surface: #fff;
-	--color-surface-hover: #f5f5f6;
-	--color-border: #dedee3;
-	--color-border-strong: #c7c7cf;
-	--color-text: #171719;
-	--color-text-muted: #64646c;
-	--color-text-faint: #66666f;
-	--color-accent: #675ee8;
-	--color-accent-muted: rgba(103, 94, 232, 0.1);
-	--color-success: #208c65;
+	--color-surface-hover: #f7f8f2;
+	--color-border: #d7dbce;
+	--color-border-strong: #aeb5a3;
+	--color-text: #171a14;
+	--color-text-muted: #5d6357;
+	--color-text-faint: #6d7367;
+	--color-accent: #597600;
+	--color-accent-muted: rgb(89 118 0 / 10%);
+	--color-success: #287a42;
 }
 
 * {
@@ -49,83 +54,29 @@ body {
 
 ::selection {
 	background: var(--color-accent);
-	color: #fff;
+	color: #0b0c09;
 }
 
-.skip-link {
-	position: fixed;
-	top: 0.5rem;
-	left: 0.5rem;
-	z-index: 100;
-	transform: translateY(-200%);
-	border-radius: 0.375rem;
-	background: var(--color-text);
-	box-shadow: 0 0 0 2px var(--color-bg);
-	color: var(--color-bg);
-	padding: 0.625rem 0.875rem;
+.mantine-Button-root {
+	position: relative;
+	overflow: hidden;
+	transition: 360ms var(--motion-ease);
+	transition-property: background-color, border-color, box-shadow, color, opacity, transform;
 }
 
-.skip-link:focus {
-	transform: translateY(0);
+.mantine-Button-root:hover:not(:disabled) {
+	transform: translateY(-1px);
+	box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
 
-.app-header {
-	position: sticky;
-	top: 0;
-	z-index: 10;
-	border-bottom: 1px solid var(--color-border);
-	background: color-mix(in srgb, var(--color-bg) 88%, transparent);
-	backdrop-filter: blur(16px);
+.mantine-Button-root:active:not(:disabled) {
+	transform: translateY(0) scale(0.985);
 }
 
-.app-header__mark {
-	display: grid;
-	width: 30px;
-	height: 30px;
-	place-items: center;
-	border: 1px solid var(--color-border-strong);
-	border-radius: 8px;
-	background: var(--color-surface);
-	color: var(--color-text);
-}
-
-.app-header__link {
-	border: 1px solid transparent;
-	border-radius: 7px;
-	color: var(--color-text-muted);
-	font-size: 0.8125rem;
-	font-weight: 500;
-	padding: 0.45rem 0.7rem;
-	transition: 160ms ease;
-	transition-property: background, border-color, color;
-}
-
-.app-header__link:hover,
-.app-header__link.active {
-	border-color: var(--color-border);
-	background: var(--color-surface);
-	color: var(--color-text);
-}
-
-.catalog-search__label {
-	margin-bottom: 0.5rem;
-	color: var(--color-text-muted);
-	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-	font-size: 0.7rem;
-	font-weight: 600;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-}
-
-.catalog-search__input {
-	height: 46px;
-	border-color: var(--color-border);
-	background: var(--color-bg-subtle);
-	color: var(--color-text);
-}
-
-.catalog-search__input:focus {
+.mantine-Button-root:is([data-variant='default'], [data-variant='subtle']):hover:not(:disabled) {
 	border-color: var(--color-accent);
+	background-color: var(--color-accent);
+	color: #0b0c09;
 }
 
 :focus-visible {
@@ -138,6 +89,10 @@ body {
 	*::before,
 	*::after {
 		scroll-behavior: auto !important;
+		animation-delay: 0s !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-delay: 0s !important;
 		transition-duration: 0.01ms !important;
 	}
 }
