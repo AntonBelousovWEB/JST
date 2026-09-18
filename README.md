@@ -1,40 +1,60 @@
+<div align="center">
+
+<img src="docs/assets/banner.svg" width="100%" alt="Frontend Starter banner" />
+
+<br />
+
+<a href="https://github.com/AntonBelousovWEB/JST/actions/workflows/ci.yml"><img src="https://github.com/AntonBelousovWEB/JST/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI" /></a>
+<a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white" alt="TypeScript" /></a>
+<a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React" /></a>
+<a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-%3E%3D24%20%3C25-339933?logo=node.js&logoColor=white" alt="Node.js" /></a>
+<a href="https://github.com/AntonBelousovWEB/JST/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs welcome" /></a>
+
+</div>
+
 # Frontend Starter
 
-A production-oriented React starter for applications that need server rendering, explicit architectural boundaries, and a small but serious delivery pipeline.
+A React starter with server rendering, enforced architectural boundaries, and a working delivery pipeline: React Router Framework Mode for SSR, Reatom for view models, dependency injection for effectful boundaries, and a shared HTTP client that keeps transport out of the domain layer.
 
-It uses React Router Framework Mode for SSR instead of a hand-written server. The removable reference application shows local persistence and a real JSONPlaceholder request flowing through pages, features, entities, repositories, services, view-model stores, DI, and UI.
+A reference app — a live JSONPlaceholder request and a local-persistence workflow — exercises every layer described below. Remove it when you're ready to build; the architecture stays.
 
-## Stack
+<div align="center">
+<img src="docs/assets/screenshot.png" width="80%" alt="Screenshot of the reference application" />
+</div>
 
-- React 19 and TypeScript
-- React Router Framework Mode with SSR
-- Vite
-- Reatom stable
-- Mantine UI
-- SSR-compatible file-based SVG sprite generation
-- Needle DI with one container per rendered application
-- Shared HTTP client over native Fetch with explicit repository boundaries
-- Vitest and Playwright
-- ESLint architecture rules, Stylelint, Knip, lint-staged, Husky, and GitHub Actions
+## Table of contents
+
+- [Quick start](#quick-start)
+- [Technology stack](#technology-stack)
+- [Project structure](#project-structure)
+- [Architecture](#architecture)
+- [Routing and SSR](#routing-and-ssr)
+- [State, styling, icons](#state-styling-icons)
+- [AI architecture guidance](#ai-architecture-guidance)
+- [Commands](#commands)
+- [Quality gates](#quality-gates)
+- [Production](#production)
+- [Deliberate omissions](#deliberate-omissions)
+- [Contributing, security, license](#contributing-security-license)
 
 ## Quick start
 
-Requirements: Node.js 24 and npm 11.
+Requirements: **Node.js 24**, **npm 11**.
 
 ```bash
 npm ci
 npm run dev
 ```
 
-The development server is available at `http://localhost:5173` with SSR, HMR, and route type generation.
+Dev server: `http://localhost:5173` (SSR, HMR, route type generation).
 
-Configure a new application interactively:
+Configure the template interactively:
 
 ```bash
 npm run template:setup
 ```
 
-The setup is intentionally one-way. It configures the package/display name, SEO description, document language, Mantine color scheme and primary color, and whether to retain the working example. Every choice also has a non-interactive flag:
+Sets package/display name, SEO description, document language, Mantine color scheme and primary color, and whether to keep the reference app. Non-interactive equivalent:
 
 ```bash
 npm run template:setup -- --yes --name my-product --title "My Product" \
@@ -42,32 +62,91 @@ npm run template:setup -- --yes --name my-product --title "My Product" \
   --color-scheme auto --primary-color violet --demo remove
 ```
 
-Run `npm run template:setup -- --help` for the complete CLI reference.
+Full CLI reference: `npm run template:setup -- --help`.
 
-## Architecture
+## Technology stack
+
+| Layer | Technologies |
+| --- | --- |
+| Runtime & UI | [React 19](https://react.dev/), [TypeScript 5.9](https://www.typescriptlang.org/), [Mantine 9](https://mantine.dev/) |
+| Framework & build | [React Router 8](https://reactrouter.com/) (Framework Mode, SSR), [Vite 8](https://vite.dev/) |
+| State | [Reatom](https://reatom.dev/) |
+| DI | [Needle DI](https://github.com/needle-di/needle-di) |
+| HTTP | Native Fetch behind a shared, repository-scoped client |
+| Testing | [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/), [Axe](https://www.deque.com/axe/) |
+| Quality | [ESLint](https://eslint.org/) (type-aware) + [`@boundaries/eslint-plugin`](https://github.com/boundaries-io/eslint-plugin), [Stylelint](https://stylelint.io/), [Knip](https://knip.dev/), lint-staged, Husky |
+| Icons | [vite-plugin-svg-icons-ng](https://github.com/6thpath/vite-plugin-svg-icons-ng) (build-time sprite) |
+| CI | GitHub Actions, Dependabot (weekly) |
+
+## Project structure
 
 ```text
 src/
-├── app/          application providers, DI composition, and root layout
+├── app/          application providers, DI composition, root layout
 ├── pages/        React Router route modules and page composition
 ├── widgets/      reusable page-level UI blocks
 ├── features/     user-facing use cases
-├── entities/     domain models, services, repositories, stores, and entity UI
+├── entities/     domain models, services, repositories, stores, entity UI
 └── shared/       framework-independent infrastructure and utilities
 ```
 
-Higher layers may depend on lower layers, never the reverse. ESLint resolves both aliases and relative imports before enforcing the boundaries:
+Dependency direction is one-way and lint-enforced (aliases and relative imports both checked):
 
-- `shared` cannot import application or domain layers;
-- `entities` can depend only on `entities` and `shared`;
-- `features` cannot depend on `app`, `pages`, or `widgets`;
+- `shared` cannot import `app`/`pages`/`entities`/`features`/`widgets`.
+- `entities` can depend only on `entities` and `shared`.
+- `features` cannot depend on `app`, `pages`, or `widgets`.
 - `widgets` cannot depend on `app` or `pages`.
 
-Types stay next to the code they describe. Create a separate `types.ts` only when it improves a module, not to satisfy a repository-wide ritual.
+Types live next to the code they describe; a standalone `types.ts` is created only when it earns its place, not by convention.
 
-### Routing and SSR
+## Architecture
 
-[`src/routes.ts`](src/routes.ts) uses React Router's official file-route convention to discover route modules under `src/pages` during development, type generation, and builds. There is no browser-side directory scan or route registry to maintain:
+Each use case is modeled before it's implemented, in this order: domain types and invariants → consumer-owned ports (the minimum I/O a use case needs) → adapters implementing those ports (HTTP, storage) → a service as the use-case facade → a Reatom store as view model → an entry that maps the store to a props-driven view. Static pages and trivial controls skip the layers they don't need.
+
+**Presentation (MVC/MVVM):** the Reatom store is the view model (derived async state + user actions); the entry is the controller mapping store to props; the view is a pure function of props with no knowledge of stores or services.
+
+```tsx
+export const PostsFeedEntry = reatomComponent(() => {
+	const { postsStore } = usePostsFeedService()
+	return (
+		<PostsFeedView
+			error={postsStore.posts.error()}
+			pending={postsStore.posts.pending() > 0}
+			posts={postsStore.posts.data()}
+			ready={postsStore.posts.ready()}
+			onRefresh={wrap(() => postsStore.refresh())}
+		/>
+	)
+}, 'PostsFeedEntry')
+```
+
+**SOLID, mapped to real classes:**
+
+| Principle | Where |
+| --- | --- |
+| Single responsibility | `HttpClient` → `PostsApi` → `PostsService` → `PostsStore`, each with one reason to change |
+| Open/closed | `PostsRepository` port + `PostsApi` adapter — swap backends by rebinding the token |
+| Liskov substitution | `PostsApi implements PostsRepository`, `LocalStoragePersister implements KeyValueStorage` |
+| Interface segregation | `PostsRepository` (one method), `KeyValueStorage` (four methods), `PostsFeedDeps` (`{ postsStore }`) |
+| Dependency inversion | `PostsService` depends on `POSTS_REPOSITORY_TOKEN`, never on `PostsApi` directly |
+
+**Dependency injection / IoC / service locator — three distinct things:**
+
+- *DI*: dependencies arrive via constructor (`inject(POSTS_REPOSITORY_TOKEN)`), not import-time singletons.
+- *IoC*: [`createAppContainer()`](src/app/container/container.ts) auto-discovers every `*.provider.ts` via `import.meta.glob` and binds adapters to ports.
+- *Service locator* (`useService`): scoped strictly to `app`/`pages` composition. Lower layers never call it directly — they get dependencies through constructors or narrow feature injectors (`PostsFeedDeps`).
+
+Inject effectful or replaceable boundaries only (HTTP, storage, clocks, analytics) — never plain data or a single-implementation interface.
+
+**Design patterns:** Builder ([`PostsBuilder`](src/entities/post/model/posts.builder.ts), [`TemplateItemsBuilder`](src/entities/templateModule/model/templateItems.builder.ts)) for staged model construction; Observer (Reatom `computed`/`action` + `reatomComponent`) for view-model → view updates; Facade ([`PostsService.getFeaturedPosts()`](src/entities/post/services/posts.service.ts)) for multi-step use cases; Gateway ([`PostsApi`](src/entities/post/repository/posts.api.ts), [`LocalStoragePersister`](src/shared/storages/LocalStoragePersister.ts)) for external effects. Object relationships are composition/aggregation, not inheritance; inheritance appears only via `implements`.
+
+**Bounded contexts:** `entities/post` (live API) and `entities/templateModule` (local persistence) share nothing but `shared` infrastructure. DTOs (`src/shared/dto`) never reach UI — each service maps DTOs into its own domain model.
+
+`npm run lint:architecture` verifies the DI kernel and that feature UI never imports orchestration internals; ESLint separately enforces layer direction.
+
+## Routing and SSR
+
+[`src/routes.ts`](src/routes.ts) discovers route modules under `src/pages` by file convention — no manual route registry:
 
 ```text
 src/pages/
@@ -76,130 +155,64 @@ src/pages/
 └── products.$productId/route.tsx    /products/:productId
 ```
 
-Keep route-local components and tests next to `route.tsx`; only the route module is discovered. The `@/` alias keeps cross-layer imports stable, while relative imports remain local to a route folder.
+Add `navigation.ts` beside a route to include it in primary navigation — these metadata modules are discovered at build time without eagerly importing route code.
 
-Add an optional `navigation.ts` beside a route when it should appear in the primary navigation. [`src/app/navigation.ts`](src/app/navigation.ts) discovers only these small metadata modules at build time, so adding a page never requires editing a central registry and does not eagerly import route code.
+React Router owns the dev server, builds, HTTP responses, hydration, and route errors; [`src/root.tsx`](src/root.tsx) owns only the document shell and providers. React 19 hoists `<title>`/`<meta>`/`<link>` into the head during SSR. The root route sends safe, origin-independent headers only — CSP, HSTS, and other deployment-specific policies belong in your hosting config.
 
-React Router owns the development server, client/server builds, HTTP responses, hydration, route errors, and production serving. [`src/root.tsx`](src/root.tsx) owns only the document shell and application providers. This keeps transport concerns out of the domain layers and avoids maintaining a second, partial web framework in the repository.
+## State, styling, icons
 
-### Metadata and response security
+- **State:** Reatom stores live in the owning entity; feature entries subscribe via `reatomComponent`. Leaf UI never resolves stores, services, or the container directly.
+- **Styling:** colocated CSS Modules matching their owner's basename (`PostCard.tsx` / `PostCard.module.css`). `src/index.css` holds only tokens, resets, and accessibility defaults. `npm run lint:styles` enforces naming, colocation, and camelCase locals.
+- **Icons:** put SVGs in `src/shared/assets/icons`; the build compiles them into a sprite present in server HTML. Render via [`SvgIcon`](src/shared/ui/SvgIcon.tsx) — decorative by default, pass `aria-label` for meaningful icons.
 
-React 19 hoists native `<title>`, `<meta>`, and `<link>` elements into the document head during SSR, so route modules can own their metadata without another head manager. The example includes description and social metadata; add canonical URLs, robots rules, and share images only when the deployment origin and assets are real.
+## AI architecture guidance
 
-The root route sends safe, origin-independent browser headers. Content Security Policy, HSTS, cross-origin isolation, and feature policies belong in deployment configuration once the product's domains, embeds, OAuth flows, and third-party scripts are known.
-
-### Dependency injection
-
-[`src/app/container/container.ts`](src/app/container/container.ts) discovers `*.provider.ts` modules and builds a fresh container for each server render. The hydrated browser application keeps its container for the lifetime of the app. Tests can replace bindings through a child container.
-
-Each discovered module named-exports a `provider` function. `useService` is limited to application/page composition; lower layers receive constructor dependencies or narrow feature-injector values. Product metadata and theme defaults live together in [`src/shared/config.ts`](src/shared/config.ts); `template:setup` writes them from validated CLI answers.
-
-### SVG icons
-
-Put repository-owned icons under `src/shared/assets/icons`. The maintained `vite-plugin-svg-icons-ng` successor compiles them into a cached sprite, fails the build on broken or duplicate icons, and exposes the sprite to the React Router document shell during SSR. Render an icon with the accessible-by-default [`SvgIcon`](src/shared/ui/SvgIcon.tsx):
-
-```tsx
-<>
-	<SvgIcon name="app" />
-	<SvgIcon name="actions-save" aria-label="Save" />
-</>
-```
-
-Decorative icons are hidden from assistive technology; providing `aria-label` gives the SVG image semantics. Nested folders become name prefixes. The sprite is present in server HTML, so icons do not wait for hydration or an extra request.
-
-### State
-
-The example uses the stable Reatom packages. Stores stay in the owning entity and expose state and operations to feature entries. The entry subscribes through `reatomComponent` and maps the store to props-driven UI; leaf UI does not resolve stores, services, repositories, or injectors.
-
-### Styling
-
-Component and route styles use colocated CSS Modules whose basename matches their owner:
-
-```text
-PostCard.tsx
-PostCard.module.css
-
-home.page.tsx
-home.page.module.css
-```
-
-Import the module as `styles` and use camelCase local names (`styles.requestStatus`). A stylesheet may style only its owner's markup; do not import another feature's or entity's private module. Pass module classes through Mantine's `className`/`classNames` APIs when styling component slots.
-
-[`src/index.css`](src/index.css) is the sole application-global stylesheet. Keep only design tokens, reset/base rules, accessibility defaults, and intentional third-party integration overrides there. Shared visual values belong in CSS custom properties; component-specific values stay local until another real consumer exists.
-
-Plain CSS is the default because Vite supports CSS Modules directly and modern CSS already provides variables, nesting-compatible selectors, container queries, and color functions. Do not install Sass pre-emptively. If a product genuinely needs Sass, adopt `.module.scss` consistently and extend the style toolchain in the same change instead of mixing unlinted formats.
-
-`npm run lint:styles` enforces CSS quality, camelCase module classes, the `.module.css` suffix, colocation, and owner/file basename matching. The same gate runs in CI and pre-commit checks.
-
-### Remote data flow
-
-The posts example deliberately keeps the network slice concrete and removable:
-
-```text
-page composition
-  → posts feature
-    → Reatom view-model store
-      → domain service and DTO mapper
-        → repository port
-          → JSONPlaceholder adapter
-```
-
-The shared HTTP client owns URL construction, query serialization, headers, JSON parsing, and HTTP failure handling. The entity adapter declares only the endpoint and DTO response contract. The service converts DTOs into the domain model, so transport fields never reach UI. Product-specific authentication, retries, runtime schemas, and caching remain opt-in because their policies depend on the real backend.
-
-### AI architecture guidance
-
-[`skills/frontend-architecture/SKILL.md`](skills/frontend-architecture/SKILL.md) is the compact source of truth for coding agents. It defines layer ownership, the DTO/repository/service/view-model flow, and the boundary between useful dependency injection and unnecessary indirection. [`AGENTS.md`](AGENTS.md) points repository-aware agents to it automatically.
-
-`npm run lint:architecture` protects the non-demo architecture kernel and rejects feature UI that imports orchestration internals. ESLint separately enforces the FSD dependency direction. This keeps the reference implementation and the written guidance from drifting apart.
+[`skills/frontend-architecture/SKILL.md`](skills/frontend-architecture/SKILL.md) is the compact reference for coding agents: layer ownership, the DTO → repository → service → view-model flow, and when DI is warranted. [`AGENTS.md`](AGENTS.md) points agents to it automatically.
 
 ## Commands
 
 | Command | Purpose |
 | --- | --- |
-| `npm run dev` | Start the React Router SSR development server |
+| `npm run dev` | Start the SSR dev server |
 | `npm run typecheck` | Generate route types and run TypeScript |
-| `npm run build` | Type-check and create production client/server builds |
+| `npm run build` | Type-check and build client/server bundles |
 | `npm start` | Serve the production build |
-| `npm test` | Run Vitest in watch mode |
-| `npm run test:unit` | Run unit and integration tests once |
+| `npm test` | Vitest in watch mode |
+| `npm run test:unit` | Run unit/integration tests once |
 | `npm run test:e2e` | Build and run Playwright SSR/hydration tests |
-| `npm run lint` | Run cached, type-aware ESLint with zero warnings |
-| `npm run lint:architecture` | Verify the DI kernel and feature UI isolation |
+| `npm run lint` | Cached, type-aware ESLint, zero warnings |
+| `npm run lint:architecture` | Verify DI kernel and feature UI isolation |
 | `npm run lint:fix` | Apply safe ESLint fixes |
-| `npm run lint:styles` | Enforce Stylelint and the colocated CSS Module contract |
-| `npm run knip` | Find unused files, exports, and dependencies |
-| `npm run check` | Run the local CI quality gate |
-| `npm run template:setup` | Configure the product interactively or through flags |
+| `npm run lint:styles` | Stylelint + CSS Module contract |
+| `npm run knip` | Find unused files, exports, dependencies |
+| `npm run check` | Run the full local CI gate |
+| `npm run template:setup` | Configure the product |
 
 ## Quality gates
 
-- Vitest collects colocated application tests and tooling tests under `scripts/**/__tests__`.
-- Playwright verifies usable server-rendered HTML with JavaScript disabled, a stable initial color scheme, route errors, clean hydration, the live API success/error flow, keyboard bypass navigation, and automated accessibility checks with Axe.
-- Knip keeps dead files, exports, and dependencies out of the template.
-- Stylelint and the file-contract check reject invalid CSS and unscoped local styles.
-- Pre-commit checks operate only on staged files; the full gate runs in CI.
-- GitHub Actions runs lint, unit tests, type checking, the production build, and Chromium E2E tests.
-- Dependabot proposes weekly npm and GitHub Actions updates.
+- **Vitest** — colocated app tests plus `scripts/**/__tests__`.
+- **Playwright** — SSR HTML with JS disabled, stable initial color scheme, route errors, clean hydration, live API success/error paths, keyboard navigation, Axe accessibility checks.
+- **Knip** — dead files, exports, dependencies.
+- **Stylelint** — CSS quality and colocation contract.
+- **Husky + lint-staged** on commit; full gate in **GitHub Actions** (lint, unit tests, typecheck, build, Chromium E2E). **Dependabot** runs weekly.
 
-Run the complete local gate before opening a pull request:
+Before opening a PR:
 
 ```bash
 npm run check
 npm run test:e2e
 ```
 
-### E2E organization
-
-Group scenarios by product area instead of putting every test in one directory:
+E2E specs are grouped by product area, not dumped in one folder:
 
 ```text
 e2e/
-├── smoke/                 universal SSR, errors, hydration, and accessibility checks
+├── smoke/                 SSR, errors, hydration, accessibility
 ├── checkout/              checkout journeys
 └── account-settings/      account journeys
 ```
 
-Use `*.spec.ts` files and Playwright's role- or label-based locators. Keep a workflow in the spec until selectors or actions are genuinely shared by several scenarios; only then extract a fixture or page object. The removable example follows the same rule in `e2e/template-catalog/`, and clean setup removes that directory while preserving the universal smoke suite.
+Use `*.spec.ts` with role/label-based Playwright locators; extract a fixture or page object only once a workflow is genuinely shared.
 
 ## Production
 
@@ -208,17 +221,24 @@ npm run build
 PORT=3000 npm start
 ```
 
-Deploy `build/`, `package.json`, `package-lock.json`, and production dependencies to any Node.js host. Use a platform-specific React Router adapter only when the target platform requires one.
+Deploy `build/`, `package.json`, `package-lock.json`, and production dependencies to any Node.js host. Add a platform-specific React Router adapter only if your target requires one.
 
 ## Deliberate omissions
 
-There is no auth framework, mock server, analytics SDK, runtime schema library, or environment schema in the base template. Add those after the product has a real contract for them; speculative infrastructure makes starters harder to remove and easier to misuse.
+No auth framework, mock server, analytics SDK, runtime schema library, or environment schema is included — add these once the product has a real contract for them.
 
-- A service worker needs an explicit offline/update/cache policy and tests; a generic cache can serve stale SSR or authenticated responses.
-- Partytown only helps after real third-party scripts measurably block the main thread.
-- Unhead duplicates React 19 and React Router metadata handling.
-- Helmet is Express middleware; this template uses React Router response headers and has no custom Express server.
+- A service worker needs an explicit offline/update/cache policy; a generic cache can serve stale SSR or authenticated responses.
+- Partytown only helps once real third-party scripts measurably block the main thread.
+- Unhead would duplicate React 19 / React Router's own metadata handling.
+- Helmet is Express middleware; this template has no custom Express server.
 
-## Contributing and security
+## Contributing, security, license
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the change workflow. Report vulnerabilities according to [`SECURITY.md`](SECURITY.md), never in a public issue.
+- Contribution workflow: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Report vulnerabilities per [`SECURITY.md`](SECURITY.md) — never in a public issue.
+
+---
+
+<div align="center">
+  <sub>React 19, React Router, TypeScript, Reatom, Mantine. Keep the architecture, delete the demo.</sub>
+</div>
