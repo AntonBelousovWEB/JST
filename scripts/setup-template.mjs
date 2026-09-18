@@ -35,7 +35,6 @@ const demoPaths = [
 	'src/shared/api',
 	'src/shared/dto/postDto.types.ts',
 	'src/shared/dto/templateItemDto.types.ts',
-	'src/shared/lib/react.ts',
 	'e2e/posts-feed',
 	'e2e/template-catalog',
 ]
@@ -168,21 +167,31 @@ async function writeCleanHomePage() {
 	await mkdir(homePageDir, { recursive: true })
 	await writeFile(
 		resolve(homePageDir, 'route.tsx'),
-		`import { Stack, Text, Title } from '@mantine/core'
-import { APP_CONFIG } from '@/shared/config'
+		`import { APP_CONFIG } from '@/shared/config'
+import { HomePage } from './home.page'
 
-export default function HomePage() {
+export default function HomeRoute() {
 \treturn (
 \t\t<>
 \t\t\t<title>{APP_CONFIG.name}</title>
 \t\t\t<meta name="description" content={APP_CONFIG.description} />
-\t\t\t<Stack gap="sm" py="xl">
-\t\t\t\t<Title order={1}>{APP_CONFIG.name}</Title>
-\t\t\t\t<Text c="dimmed">
-\t\t\t\t\tThe starter example has been removed. Begin building your app here.
-\t\t\t\t</Text>
-\t\t\t</Stack>
+\t\t\t<HomePage />
 \t\t</>
+\t)
+}
+`,
+	)
+	await writeFile(
+		resolve(homePageDir, 'home.page.tsx'),
+		`import { Stack, Text, Title } from '@mantine/core'
+import { APP_CONFIG } from '@/shared/config'
+
+export function HomePage() {
+\treturn (
+\t\t<Stack gap="sm" py="xl">
+\t\t\t<Title order={1}>{APP_CONFIG.name}</Title>
+\t\t\t<Text c="dimmed">Start with a bounded context and one complete vertical slice.</Text>
+\t\t</Stack>
 \t)
 }
 `,
@@ -213,6 +222,7 @@ async function updatePackageJson(options) {
 		for (const dependency of demoDependencies) {
 			delete packageJson.dependencies[dependency]
 		}
+		packageJson.knip = { ignore: ['src/shared/lib/react.ts'] }
 	}
 
 	await writeJson(packageJsonPath, packageJson)
@@ -275,9 +285,12 @@ npm run dev
 - Product metadata and theme defaults live in \`src/shared/config.ts\`.
 - Routes are discovered from \`src/pages\`; add optional page-local \`navigation.ts\`
   metadata to expose a route in the navbar.
-- The DI container discovers default-exported \`*.provider.ts\` functions under
+- The DI container discovers named \`provider\` functions from \`*.provider.ts\` modules under
   \`entities\`, \`features\`, and \`shared\`. React code resolves tokens with
-  \`useService\` from \`src/app/container/container.context.ts\`.
+  \`useService\` from \`src/app/container/container.context.ts\` only at app/page
+  composition roots; feature entries receive narrow dependencies via injectors.
+- Keep feature views props-driven. Stores, services, repositories, adapters, and
+  injectors belong behind the feature entry, not inside \`features/*/ui\`.
 - Put SVG icons in \`src/shared/assets/icons\` and render them with \`SvgIcon\`
   from \`src/shared/ui/SvgIcon.tsx\`. Nested directories become name prefixes.
 - Group Playwright specs by product area under \`e2e/\`; universal checks stay

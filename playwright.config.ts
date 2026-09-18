@@ -2,6 +2,7 @@ import process from 'node:process'
 import { defineConfig, devices } from '@playwright/test'
 
 const isCI = Boolean(process.env.CI)
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 4173)
 
 export default defineConfig({
 	testDir: './e2e',
@@ -16,7 +17,7 @@ export default defineConfig({
 	timeout: 30_000,
 
 	use: {
-		baseURL: 'http://localhost:5173',
+		baseURL: `http://localhost:${port}`,
 		screenshot: 'only-on-failure',
 		trace: 'on-first-retry',
 	},
@@ -30,9 +31,9 @@ export default defineConfig({
 
 	webServer: {
 		command: isCI ? 'npm start' : 'npm run build && npm start',
-		env: { PORT: '5173' },
-		port: 5173,
-		reuseExistingServer: !isCI,
+		env: { PORT: String(port) },
+		port,
+		reuseExistingServer: false,
 		timeout: 60_000,
 	},
 })

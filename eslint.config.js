@@ -85,4 +85,15 @@ export default antfu(
 			}],
 		},
 	},
+	{
+		files: ['src/features/*/ui/**/*.{ts,tsx}'],
+		rules: {
+			'no-restricted-imports': ['error', {
+				patterns: [{
+					group: ['**/*.injector', '**/*.store', '**/data/**', '**/repository/**', '**/services/**'],
+					message: 'Feature UI must receive state and actions through props. Keep DI and orchestration in the feature entry.',
+				}],
+			}],
+		},
+	},
 )

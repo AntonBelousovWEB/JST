@@ -92,7 +92,7 @@ The root route sends safe, origin-independent browser headers. Content Security 
 
 [`src/app/container/container.ts`](src/app/container/container.ts) discovers `*.provider.ts` modules and builds a fresh container for each server render. The hydrated browser application keeps its container for the lifetime of the app. Tests can replace bindings through a child container.
 
-Each discovered module default-exports a provider function. React code resolves a token with `useService` from [`src/app/container/container.context.ts`](src/app/container/container.context.ts). Product metadata and theme defaults live together in [`src/shared/config.ts`](src/shared/config.ts); `template:setup` writes them from validated CLI answers.
+Each discovered module named-exports a `provider` function. `useService` is limited to application/page composition; lower layers receive constructor dependencies or narrow feature-injector values. Product metadata and theme defaults live together in [`src/shared/config.ts`](src/shared/config.ts); `template:setup` writes them from validated CLI answers.
 
 ### SVG icons
 
@@ -109,7 +109,7 @@ Decorative icons are hidden from assistive technology; providing `aria-label` gi
 
 ### State
 
-The example uses the stable Reatom packages. Stores stay in the owning entity and expose state and operations to features; React components subscribe through `reatomComponent`.
+The example uses the stable Reatom packages. Stores stay in the owning entity and expose state and operations to feature entries. The entry subscribes through `reatomComponent` and maps the store to props-driven UI; leaf UI does not resolve stores, services, repositories, or injectors.
 
 ### Styling
 
@@ -150,6 +150,8 @@ The shared HTTP client owns URL construction, query serialization, headers, JSON
 
 [`skills/frontend-architecture/SKILL.md`](skills/frontend-architecture/SKILL.md) is the compact source of truth for coding agents. It defines layer ownership, the DTO/repository/service/view-model flow, and the boundary between useful dependency injection and unnecessary indirection. [`AGENTS.md`](AGENTS.md) points repository-aware agents to it automatically.
 
+`npm run lint:architecture` protects the non-demo architecture kernel and rejects feature UI that imports orchestration internals. ESLint separately enforces the FSD dependency direction. This keeps the reference implementation and the written guidance from drifting apart.
+
 ## Commands
 
 | Command | Purpose |
@@ -162,6 +164,7 @@ The shared HTTP client owns URL construction, query serialization, headers, JSON
 | `npm run test:unit` | Run unit and integration tests once |
 | `npm run test:e2e` | Build and run Playwright SSR/hydration tests |
 | `npm run lint` | Run cached, type-aware ESLint with zero warnings |
+| `npm run lint:architecture` | Verify the DI kernel and feature UI isolation |
 | `npm run lint:fix` | Apply safe ESLint fixes |
 | `npm run lint:styles` | Enforce Stylelint and the colocated CSS Module contract |
 | `npm run knip` | Find unused files, exports, and dependencies |
